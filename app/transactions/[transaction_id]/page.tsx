@@ -30,13 +30,13 @@ export default function TransactionDetailPage({ params }: { params: { transactio
       title: "Collection of Programming Books",
       image: "/programming-books-stack.jpg",
     },
-    offeredPrice: '50.00', // or a number like 50.00
+    offeredPrice: "50.00", // or a number like 50.00
     requester: {
       name: "Mike Chen",
       avatar: "/diverse-user-avatars.png",
     },
     message: "Hi! I'd love to trade my programming books for your camera. They're in excellent condition!",
-    meetupLocation: 'NYU', // Set when accepted
+    meetupLocation: "NYU", // Set when accepted
     timeline: [
       { status: "Request Sent", date: "2 hours ago", completed: true },
       { status: "Awaiting Response", date: "Pending", completed: false },
@@ -254,19 +254,6 @@ export default function TransactionDetailPage({ params }: { params: { transactio
             </Card>
 
             {/* Actions */}
-            {transaction.status === "pending" && (
-              <div className="flex gap-3">
-                <Button size="lg" className="flex-1">
-                  <CheckCircle2 className="h-4 w-4 mr-2" />
-                  Accept Trade
-                </Button>
-                <Button size="lg" variant="outline" className="flex-1 bg-transparent">
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Decline
-                </Button>
-              </div>
-            )}
-
             {transaction.status === "accepted" && (
               <Button size="lg" className="w-full" asChild>
                 <Link href="/messages">

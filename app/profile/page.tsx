@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Calendar, Star, Package, Heart, Clock, LogOut } from "lucide-react"
+import { MapPin, Calendar, Star, Package, Clock, LogOut } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { logoutUser } from "@/lib/auth"
@@ -126,14 +126,10 @@ export default function ProfilePage() {
           {/* Profile Content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="listings" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="listings">
                   <Package className="h-4 w-4 mr-2" />
                   Listings
-                </TabsTrigger>
-                <TabsTrigger value="favorites">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Favorites
                 </TabsTrigger>
                 <TabsTrigger value="history">
                   <Clock className="h-4 w-4 mr-2" />
@@ -166,30 +162,17 @@ export default function ProfilePage() {
                             <Badge variant="secondary">{item.type}</Badge>
                           </div>
                           <div className="flex gap-2 mt-3">
-                            <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                              Edit
+                            <Button size="sm" variant="outline" className="flex-1 bg-transparent" asChild>
+                              <Link href={`/item/${item.id}/edit`}>Edit</Link>
                             </Button>
-                            <Button size="sm" variant="outline" className="flex-1 bg-transparent">
-                              View
+                            <Button size="sm" variant="outline" className="flex-1 bg-transparent" asChild>
+                              <Link href={`/item/${item.id}`}>View</Link>
                             </Button>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
                   </div>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="favorites" className="mt-6">
-                <div className="text-center py-12">
-                  <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No favorites yet</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Start browsing items and save your favorites here
-                  </p>
-                  <Button asChild>
-                    <Link href="/">Browse Items</Link>
-                  </Button>
                 </div>
               </TabsContent>
 

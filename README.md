@@ -25,19 +25,19 @@ Follow these steps to set up and run the project locally:
 2. Install `pnpm` if you haven't installed it yet:
    - Visit [https://pnpm.io/installation](https://pnpm.io/installation) for installation instructions
    - Alternatively, you can install it using npm:
-     ```bash
+     \`\`\`bash
      npm install -g pnpm
-     ```
+     \`\`\`
 
 3. Install project dependencies:
-   ```bash
+   \`\`\`bash
    pnpm install
-   ```
+   \`\`\`
 
 4. Start the development server:
-   ```bash
+   \`\`\`bash
    pnpm dev
-   ```
+   \`\`\`
 
 5. Open your browser and visit [http://localhost:3000](http://localhost:3000)
 

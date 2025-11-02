@@ -3,8 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Package, MessageCircle, User, Receipt, Search, LogIn } from "lucide-react"
+import { Package, MessageCircle, User, Receipt, LogIn } from "lucide-react"
 import { useState, useEffect } from "react"
 import { isUserLoggedIn } from "@/lib/auth"
 
@@ -37,13 +36,6 @@ export function Header() {
           </div>
           <span className="text-xl font-semibold">SwapHub</span>
         </Link>
-
-        <div className="hidden md:flex flex-1 max-w-md">
-          <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search items..." className="pl-9" />
-          </div>
-        </div>
 
         <nav className="hidden items-center gap-6 lg:flex">
           <Link href="/browse-items" className="text-sm font-medium transition-colors hover:text-primary">

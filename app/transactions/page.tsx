@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { Header } from "@/components/header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -75,6 +77,30 @@ export default function TransactionsPage() {
       rating: 5,
     },
   ]
+
+  const handleAcceptTrade = (e: React.MouseEvent, requestId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log(`[v0] Accept Trade clicked for request ID: ${requestId}`)
+  }
+
+  const handleDecline = (e: React.MouseEvent, requestId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log(`[v0] Decline clicked for request ID: ${requestId}`)
+  }
+
+  const handleCancelRequest = (e: React.MouseEvent, requestId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log(`[v0] Cancel Request clicked for request ID: ${requestId}`)
+  }
+
+  const handleMarkAsComplete = (e: React.MouseEvent, transactionId: number) => {
+    e.preventDefault()
+    e.stopPropagation()
+    console.log(`[v0] Mark as Complete clicked for transaction ID: ${transactionId}`)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -178,25 +204,14 @@ export default function TransactionsPage() {
                         {/* Actions */}
                         {request.type === "received" ? (
                           <div className="flex gap-3 mt-6">
-                            <Button
-                              className="flex-1"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                // Handle accept trade
-                              }}
-                            >
+                            <Button className="flex-1" onClick={(e) => handleAcceptTrade(e, request.id)}>
                               <CheckCircle2 className="h-4 w-4 mr-2" />
                               Accept Trade
                             </Button>
                             <Button
                               variant="outline"
                               className="flex-1 bg-transparent"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                // Handle decline
-                              }}
+                              onClick={(e) => handleDecline(e, request.id)}
                             >
                               <XCircle className="h-4 w-4 mr-2" />
                               Decline
@@ -207,11 +222,7 @@ export default function TransactionsPage() {
                             <Button
                               variant="outline"
                               className="flex-1 bg-transparent"
-                              onClick={(e) => {
-                                e.preventDefault()
-                                e.stopPropagation()
-                                // Handle cancel request
-                              }}
+                              onClick={(e) => handleCancelRequest(e, request.id)}
                             >
                               Cancel Request
                             </Button>
@@ -279,11 +290,7 @@ export default function TransactionsPage() {
                                 size="sm"
                                 variant="outline"
                                 className="bg-transparent"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  // Handle mark as complete
-                                }}
+                                onClick={(e) => handleMarkAsComplete(e, transaction.id)}
                               >
                                 Mark as Complete
                               </Button>
