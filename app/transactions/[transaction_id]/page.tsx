@@ -8,44 +8,34 @@ import { ArrowRightLeft, CheckCircle2, Clock, MessageCircle, XCircle } from "luc
 import Link from "next/link"
 import Image from "next/image"
 import { mockTransactions } from "@/lib/mock-data"
-import type { GetStaticPaths, GetStaticProps } from "next"
 
-type Transaction = (typeof mockTransactions)[0]
 
 interface TransactionDetailPageProps {
-  transaction: Transaction
+  params: {
+    transaction_id: string
+  }
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  const paths = mockTransactions.map((transaction) => ({
-    params: { transaction_id: transaction.id },
+
+export async function generateStaticParams() {
+  return mockTransactions.map((transaction) => ({
+    transaction_id: transaction.id, 
   }))
-
-  return {
-    paths,
-    fallback: false,
-  }
 }
 
-export const getStaticProps: GetStaticProps<TransactionDetailPageProps> = async ({ params }) => {
-  if (!params?.transaction_id) {
-    return { notFound: true }
-  }
 
-  const transaction = mockTransactions.find((t) => t.id === params.transaction_id)
+
+
+export default async function TransactionDetailPage({ params }: TransactionDetailPageProps) {
+  const transactionId = params.transaction_id
+
+  const transaction = mockTransactions.find((t) => t.id === transactionId)
 
   if (!transaction) {
-    return { notFound: true }
+   
+    return <div>Transaction Not Found</div>
   }
-
-  return {
-    props: { transaction },
-    revalidate: false,
-  }
-}
-
-export default function TransactionDetailPage({ transaction }: TransactionDetailPageProps) {
-  const getStatusBadge = (status: string) => {
+    const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
         return (

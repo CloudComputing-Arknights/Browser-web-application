@@ -1,6 +1,6 @@
 export const mockItems = [
   {
-    id: "1",
+    id: 1,
     title: "Vintage Film Camera",
     category: "electronics",
     condition: "good",
@@ -10,9 +10,16 @@ export const mockItems = [
     lookingFor: "Books, plants, or vintage items",
     location: "Near UT Austin campus",
     images: ["/vintage-film-camera.jpg"],
+    seller: {
+      name: "Sarah Johnson",
+      avatar: "/diverse-user-avatars.png",
+      rating: 4.8,
+      totalTrades: 12,
+    },
+    postedDate: "3 days ago",
   },
   {
-    id: "2",
+    id: 2,
     title: "Modern Office Chair",
     category: "furniture",
     condition: "like-new",
@@ -21,9 +28,16 @@ export const mockItems = [
     lookingFor: "Desk or bookshelf",
     location: "Downtown area",
     images: ["/modern-office-chair.png"],
+    seller: {
+      name: "John Doe",
+      avatar: "/diverse-user-avatars.png",
+      rating: 4.9,
+      totalTrades: 8,
+    },
+    postedDate: "5 days ago",
   },
   {
-    id: "3",
+    id: 3,
     title: "Programming Books Stack",
     category: "books",
     condition: "good",
@@ -32,6 +46,13 @@ export const mockItems = [
     lookingFor: "Electronics or plants",
     location: "University district",
     images: ["/programming-books-stack.jpg"],
+    seller: {
+      name: "Alex Kumar",
+      avatar: "/diverse-user-avatars.png",
+      rating: 4.7,
+      totalTrades: 15,
+    },
+    postedDate: "1 week ago",
   },
 ]
 
@@ -43,7 +64,7 @@ export const mockTransactions = [
     created_at: "2 hours ago",
     updated_at: "2 hours ago",
     requestedItem: {
-      id: "1",
+      id: 1,
       title: "Vintage Film Camera",
       image: "/vintage-film-camera.jpg",
       owner: {
@@ -52,7 +73,7 @@ export const mockTransactions = [
       },
     },
     offeredItem: {
-      id: "2",
+      id: 3,
       title: "Collection of Programming Books",
       image: "/programming-books-stack.jpg",
     },
@@ -76,7 +97,7 @@ export const mockTransactions = [
     created_at: "1 day ago",
     updated_at: "12 hours ago",
     requestedItem: {
-      id: "2",
+      id: 2,
       title: "Modern Office Chair",
       image: "/modern-office-chair.png",
       owner: {
@@ -105,7 +126,7 @@ export const mockTransactions = [
     created_at: "30 minutes ago",
     updated_at: "30 minutes ago",
     requestedItem: {
-      id: "3",
+      id: 3,
       title: "Programming Books Stack",
       image: "/programming-books-stack.jpg",
       owner: {
@@ -114,7 +135,7 @@ export const mockTransactions = [
       },
     },
     offeredItem: {
-      id: "1",
+      id: 1,
       title: "Indoor Plants Collection",
       image: "/indoor-plants-collection.jpg",
     },
