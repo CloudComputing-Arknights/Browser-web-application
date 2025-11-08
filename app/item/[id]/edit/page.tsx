@@ -1,3 +1,4 @@
+import type { GetStaticPaths, GetStaticProps } from "next"
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,21 +9,41 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { mockItems } from "@/lib/mock-data"
 
-export default function EditItemPage() {
-  // Mock item data
-  const item = {
-    title: "Vintage Film Camera",
-    category: "electronics",
-    condition: "good",
-    description:
-      "Beautiful vintage 35mm film camera in excellent working condition. Comes with original leather case and strap.",
-    exchangeType: "trade",
-    lookingFor: "Books, plants, or vintage items",
-    location: "Near UT Austin campus",
-    images: ["/vintage-film-camera.jpg"],
+interface EditItemPageProps {
+  item: (typeof mockItems)[0]
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = mockItems.map((item) => ({
+    params: { id: item.id },
+  }))
+
+  return {
+    paths,
+    fallback: false,
+  }
+}
+
+export const getStaticProps: GetStaticProps<EditItemPageProps> = async ({ params }) => {
+  if (!params?.id) {
+    return { notFound: true }
   }
 
+  const item = mockItems.find((i) => i.id === params.id)
+
+  if (!item) {
+    return { notFound: true }
+  }
+
+  return {
+    props: { item },
+    revalidate: false,
+  }
+}
+
+export default function EditItemPage({ item }: EditItemPageProps) {
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -137,7 +158,7 @@ export default function EditItemPage() {
               <div className="flex gap-3 pt-4">
                 <Button className="flex-1">Save Changes</Button>
                 <Button variant="outline" className="flex-1 bg-transparent" asChild>
-                  <Link href="/item/1">Cancel</Link>
+                  <Link href={`/item/${item.id}`}>Cancel</Link>
                 </Button>
               </div>
             </CardContent>

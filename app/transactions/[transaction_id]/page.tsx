@@ -7,44 +7,44 @@ import { Separator } from "@/components/ui/separator"
 import { ArrowRightLeft, CheckCircle2, Clock, MessageCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { mockTransactions } from "@/lib/mock-data"
+import type { GetStaticPaths, GetStaticProps } from "next"
 
-export default function TransactionDetailPage({ params }: { params: { transaction_id: string } }) {
-  // Mock transaction data
-  const transaction = {
-    id: params.transaction_id,
-    status: "canceled", // pending, accepted, rejected, canceled, completed
-    type: "trade", // trade or purchase
-    created_at: "2 hours ago",
-    updated_at: "2 hours ago",
-    requestedItem: {
-      id: "1",
-      title: "Vintage Film Camera",
-      image: "/vintage-film-camera.jpg",
-      owner: {
-        name: "Sarah Johnson",
-        avatar: "/diverse-user-avatars.png",
-      },
-    },
-    offeredItem: {
-      id: "2",
-      title: "Collection of Programming Books",
-      image: "/programming-books-stack.jpg",
-    },
-    offered_price: "50.00", // or a number like 50.00
-    requester: {
-      name: "Mike Chen",
-      avatar: "/diverse-user-avatars.png",
-    },
-    message: "Hi! I'd love to trade my programming books for your camera. They're in excellent condition!",
-    meetupLocation: "NYU", // Set when accepted
-    timeline: [
-      { status: "Request Sent", date: "2 hours ago", completed: true },
-      { status: "Awaiting Response", date: "Pending", completed: false },
-      { status: "Arrange Meetup", date: "Pending", completed: false },
-      { status: "Complete Trade", date: "Pending", completed: false },
-    ],
+type Transaction = (typeof mockTransactions)[0]
+
+interface TransactionDetailPageProps {
+  transaction: Transaction
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = mockTransactions.map((transaction) => ({
+    params: { transaction_id: transaction.id },
+  }))
+
+  return {
+    paths,
+    fallback: false,
+  }
+}
+
+export const getStaticProps: GetStaticProps<TransactionDetailPageProps> = async ({ params }) => {
+  if (!params?.transaction_id) {
+    return { notFound: true }
   }
 
+  const transaction = mockTransactions.find((t) => t.id === params.transaction_id)
+
+  if (!transaction) {
+    return { notFound: true }
+  }
+
+  return {
+    props: { transaction },
+    revalidate: false,
+  }
+}
+
+export default function TransactionDetailPage({ transaction }: TransactionDetailPageProps) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":

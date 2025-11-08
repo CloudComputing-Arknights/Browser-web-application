@@ -1,5 +1,6 @@
 "use client"
 
+import type { GetStaticPaths, GetStaticProps } from "next"
 import type React from "react"
 
 import { Header } from "@/components/header"
@@ -12,12 +13,45 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowRightLeft, DollarSign, Package } from "lucide-react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { mockItems } from "@/lib/mock-data"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 
-export default function RequestTradePage({ params }: { params: { item_id: string } }) {
+interface RequestTradePageProps {
+  item: (typeof mockItems)[0]
+}
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = mockItems.map((item) => ({
+    params: { item_id: item.id },
+  }))
+
+  return {
+    paths,
+    fallback: false,
+  }
+}
+
+export const getStaticProps: GetStaticProps<RequestTradePageProps> = async ({ params }) => {
+  if (!params?.item_id) {
+    return { notFound: true }
+  }
+
+  const item = mockItems.find((i) => i.id === params.item_id)
+
+  if (!item) {
+    return { notFound: true }
+  }
+
+  return {
+    props: { item },
+    revalidate: false,
+  }
+}
+
+export default function RequestTradePage({ item }: RequestTradePageProps) {
   const router = useRouter()
   const [offerType, setOfferType] = useState<"trade" | "purchase">("trade")
   const [selectedItem, setSelectedItem] = useState("")
@@ -26,9 +60,9 @@ export default function RequestTradePage({ params }: { params: { item_id: string
 
   // Mock target item data
   const targetItem = {
-    id: params.item_id,
-    title: "Vintage Film Camera",
-    image: "/vintage-film-camera.jpg",
+    id: item.id,
+    title: item.title,
+    image: item.images[0] || "/placeholder.svg",
     seller: {
       name: "Sarah Johnson",
       avatar: "/diverse-user-avatars.png",
@@ -44,7 +78,6 @@ export default function RequestTradePage({ params }: { params: { item_id: string
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // In a real app, this would send the trade request to the backend
     console.log("[v0] Trade request submitted:", { offerType, selectedItem, offerPrice, message })
     router.push("/transactions")
   }
@@ -55,7 +88,7 @@ export default function RequestTradePage({ params }: { params: { item_id: string
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
-            <Link href={`/item/${params.item_id}`} className="text-sm text-muted-foreground hover:underline">
+            <Link href={`/item/${item.id}`} className="text-sm text-muted-foreground hover:underline">
               ← Back to item
             </Link>
             <h1 className="text-3xl font-bold mt-2">Request Trade</h1>
