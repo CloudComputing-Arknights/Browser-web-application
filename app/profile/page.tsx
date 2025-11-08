@@ -5,16 +5,26 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MapPin, Calendar, Star, Package, Clock, LogOut } from "lucide-react"
+import { MapPin, Calendar, Star, Package, Clock, LogOut, Plus, Trash2, Edit2 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { logoutUser } from "@/lib/auth"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 export default function ProfilePage() {
   const router = useRouter()
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    country: "",
+    label: "",
+  })
 
-  // Mock user data - will be replaced with real data from database
   const user = {
     name: "Sarah Johnson",
     location: "Austin, TX",
@@ -59,9 +69,78 @@ export default function ProfilePage() {
     },
   ]
 
+  const savedAddresses = [
+    {
+      id: "addr_1",
+      label: "Home",
+      street: "123 Main St",
+      city: "Austin",
+      state: "TX",
+      zip: "78701",
+      country: "USA",
+    },
+    {
+      id: "addr_2",
+      label: "Office",
+      street: "456 Tech Ave",
+      city: "Austin",
+      state: "TX",
+      zip: "78702",
+      country: "USA",
+    },
+    {
+      id: "addr_3",
+      label: "Campus",
+      street: "789 University Blvd",
+      city: "Austin",
+      state: "TX",
+      zip: "78703",
+      country: "USA",
+    },
+  ]
+
   const handleLogout = () => {
     logoutUser()
     router.push("/")
+  }
+
+  const handleAddAddress = () => {
+    setEditingAddressId(null)
+    setFormData({ street: "", city: "", state: "", zip: "", country: "", label: "" })
+    setShowAddForm(true)
+  }
+
+  const handleEditAddress = (address: (typeof savedAddresses)[0]) => {
+    setEditingAddressId(address.id)
+    setFormData({
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      zip: address.zip,
+      country: address.country,
+      label: address.label,
+    })
+    setShowAddForm(true)
+  }
+
+  const handleSaveAddress = () => {
+    console.log("SIMULATE: Submitting New Address Data")
+    setShowAddForm(false)
+  }
+
+  const handleUpdateAddress = () => {
+    console.log(`SIMULATE: Updating Address ID: ${editingAddressId} with new data`)
+    setShowAddForm(false)
+  }
+
+  const handleCancelForm = () => {
+    setShowAddForm(false)
+    setEditingAddressId(null)
+    setFormData({ street: "", city: "", state: "", zip: "", country: "", label: "" })
+  }
+
+  const handleDeleteAddress = (addressId: string) => {
+    console.log(`SIMULATE: Delete Address ID: ${addressId}`)
   }
 
   return (
@@ -126,7 +205,7 @@ export default function ProfilePage() {
           {/* Profile Content */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="listings" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="listings">
                   <Package className="h-4 w-4 mr-2" />
                   Listings
@@ -134,6 +213,10 @@ export default function ProfilePage() {
                 <TabsTrigger value="history">
                   <Clock className="h-4 w-4 mr-2" />
                   History
+                </TabsTrigger>
+                <TabsTrigger value="addresses">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  Addresses
                 </TabsTrigger>
               </TabsList>
 
@@ -193,6 +276,147 @@ export default function ProfilePage() {
                             <div className="text-right">
                               <Badge variant="outline">{trade.type}</Badge>
                               <p className="text-xs text-muted-foreground mt-1">{trade.date}</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="addresses" className="mt-6">
+                <div className="space-y-4">
+                  {showAddForm && (
+                    <Card className="border-primary/50 bg-primary/5">
+                      <CardHeader>
+                        <h3 className="text-lg font-semibold">
+                          {editingAddressId ? "Edit Address" : "Add New Address"}
+                        </h3>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Label (e.g., Home, Office)</label>
+                            <input
+                              type="text"
+                              placeholder="Label"
+                              value={formData.label}
+                              onChange={(e) => setFormData({ ...formData, label: e.target.value })}
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Country</label>
+                            <input
+                              type="text"
+                              placeholder="Country"
+                              value={formData.country}
+                              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Street Address (Line 1)</label>
+                          <input
+                            type="text"
+                            placeholder="Street Address"
+                            value={formData.street}
+                            onChange={(e) => setFormData({ ...formData, street: e.target.value })}
+                            className="w-full px-3 py-2 border rounded-md text-sm"
+                          />
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-3">
+                          <div>
+                            <label className="block text-sm font-medium mb-1">City</label>
+                            <input
+                              type="text"
+                              placeholder="City"
+                              value={formData.city}
+                              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">State/Province</label>
+                            <input
+                              type="text"
+                              placeholder="State/Province"
+                              value={formData.state}
+                              onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium mb-1">Postal Code</label>
+                            <input
+                              type="text"
+                              placeholder="Postal Code"
+                              value={formData.zip}
+                              onChange={(e) => setFormData({ ...formData, zip: e.target.value })}
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex gap-3 pt-4">
+                          <Button
+                            onClick={editingAddressId ? handleUpdateAddress : handleSaveAddress}
+                            className="flex-1"
+                          >
+                            {editingAddressId ? "Save Changes" : "Save Address"}
+                          </Button>
+                          <Button variant="outline" onClick={handleCancelForm} className="flex-1 bg-transparent">
+                            Cancel
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold">Manage Addresses</h2>
+                    {!showAddForm && (
+                      <Button size="sm" onClick={handleAddAddress}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Address
+                      </Button>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {savedAddresses.map((address) => (
+                      <Card key={address.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <h3 className="font-semibold">{address.label}</h3>
+                                <Badge variant="secondary" className="text-xs">
+                                  Saved
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mt-1">{address.street}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {address.city}, {address.state} {address.zip}
+                              </p>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleEditAddress(address)}
+                                className="text-primary hover:text-primary hover:bg-primary/10"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleDeleteAddress(address.id)}
+                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
                           </div>
                         </CardContent>

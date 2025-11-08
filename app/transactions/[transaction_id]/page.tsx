@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { ArrowRightLeft, CheckCircle2, Clock, MapPin, MessageCircle, XCircle } from "lucide-react"
+import { ArrowRightLeft, CheckCircle2, Clock, MessageCircle, XCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -12,10 +12,10 @@ export default function TransactionDetailPage({ params }: { params: { transactio
   // Mock transaction data
   const transaction = {
     id: params.transaction_id,
-    status: "pending", // pending, accepted, rejected, in-progress, completed
+    status: "canceled", // pending, accepted, rejected, canceled, completed
     type: "trade", // trade or purchase
-    createdDate: "2 hours ago",
-    updatedDate: "2 hours ago",
+    created_at: "2 hours ago",
+    updated_at: "2 hours ago",
     requestedItem: {
       id: "1",
       title: "Vintage Film Camera",
@@ -30,7 +30,7 @@ export default function TransactionDetailPage({ params }: { params: { transactio
       title: "Collection of Programming Books",
       image: "/programming-books-stack.jpg",
     },
-    offeredPrice: "50.00", // or a number like 50.00
+    offered_price: "50.00", // or a number like 50.00
     requester: {
       name: "Mike Chen",
       avatar: "/diverse-user-avatars.png",
@@ -68,11 +68,11 @@ export default function TransactionDetailPage({ params }: { params: { transactio
             Rejected
           </Badge>
         )
-      case "in-progress":
+      case "canceled":
         return (
-          <Badge className="bg-orange-500">
-            <ArrowRightLeft className="h-3 w-3 mr-1" />
-            In Progress
+          <Badge variant="destructive">
+            <XCircle className="h-3 w-3 mr-1" />
+            Canceled
           </Badge>
         )
       case "completed":
@@ -172,7 +172,7 @@ export default function TransactionDetailPage({ params }: { params: { transactio
                     ) : (
                       <div className="flex items-center justify-center h-32 border rounded-lg bg-muted/50">
                         <div className="text-center">
-                          <p className="text-3xl font-bold">${transaction.offeredPrice || "0.00"}</p>
+                          <p className="text-3xl font-bold">${transaction.offered_price || "0.00"}</p>
                           <p className="text-sm text-muted-foreground mt-1">Purchase Offer</p>
                         </div>
                       </div>
@@ -234,21 +234,12 @@ export default function TransactionDetailPage({ params }: { params: { transactio
                   </div>
                   <div className="flex items-center justify-between py-2 border-b">
                     <span className="text-sm text-muted-foreground">Created</span>
-                    <span className="text-sm font-medium">{transaction.createdDate}</span>
+                    <span className="text-sm font-medium">{transaction.created_at}</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b">
                     <span className="text-sm text-muted-foreground">Last Updated</span>
-                    <span className="text-sm font-medium">{transaction.updatedDate}</span>
+                    <span className="text-sm font-medium">{transaction.updated_at}</span>
                   </div>
-                  {transaction.meetupLocation && (
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-sm text-muted-foreground">Meetup Location</span>
-                      <div className="flex items-center gap-1 text-sm font-medium">
-                        <MapPin className="h-4 w-4" />
-                        {transaction.meetupLocation}
-                      </div>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>

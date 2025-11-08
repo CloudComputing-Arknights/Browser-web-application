@@ -15,6 +15,23 @@ import { useState } from "react"
 export default function ItemDetailPage() {
   const router = useRouter()
   const [tradeStatus, setTradeStatus] = useState<string | null>(null)
+  const [comments, setComments] = useState([
+    {
+      id: 1,
+      author: "John Smith",
+      avatar: "/diverse-user-avatars.png",
+      text: "Great item! Is it still available?",
+      date: "1 day ago",
+    },
+    {
+      id: 2,
+      author: "Emily Davis",
+      avatar: "/diverse-user-avatars.png",
+      text: "Interested in trading my camera lens for this.",
+      date: "12 hours ago",
+    },
+  ])
+  const [newComment, setNewComment] = useState("")
 
   // Mock item data - will be replaced with real data from database
   const item = {
@@ -81,6 +98,21 @@ export default function ItemDetailPage() {
     console.log("[v0] Mark as Complete clicked for trade request:", tradeRequest.id)
     setTradeStatus("completed")
     console.log("[v0] Trade marked as completed")
+  }
+
+  const handlePostComment = () => {
+    if (newComment.trim()) {
+      console.log(`SIMULATE: Posting new comment on Item ID: ${item.id}`)
+      const comment = {
+        id: comments.length + 1,
+        author: "Current User",
+        avatar: "/diverse-user-avatars.png",
+        text: newComment,
+        date: "just now",
+      }
+      setComments([comment, ...comments])
+      setNewComment("")
+    }
   }
 
   return (
@@ -182,6 +214,49 @@ export default function ItemDetailPage() {
                 </CardContent>
               </Card>
             )}
+
+            {/* Comments Section */}
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                <h2 className="text-lg font-semibold">Comments</h2>
+                <Separator />
+
+                {/* Comment Form */}
+                <div className="space-y-3">
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    placeholder="Post a comment..."
+                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    rows={3}
+                  />
+                  <Button onClick={handlePostComment} className="w-full">
+                    Post Comment
+                  </Button>
+                </div>
+
+                <Separator />
+
+                {/* Comments List */}
+                <div className="space-y-4">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex gap-3">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={comment.avatar || "/placeholder.svg"} />
+                        <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm">{comment.author}</span>
+                          <span className="text-xs text-muted-foreground">{comment.date}</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">{comment.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Sidebar */}

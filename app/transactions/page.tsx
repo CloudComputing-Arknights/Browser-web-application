@@ -14,7 +14,7 @@ import Image from "next/image"
 
 export default function TransactionsPage() {
   // Mock data for trade requests
-  const pendingRequests = [
+  const pendingTransactions = [
     {
       id: 1,
       type: "received",
@@ -49,7 +49,7 @@ export default function TransactionsPage() {
       user: "Alex Rodriguez",
       userAvatar: "/diverse-user-avatars.png",
       type: "Trade",
-      status: "In Progress",
+      status: "accepted",
       date: "3 days ago",
       nextStep: "Arrange meetup",
     },
@@ -118,7 +118,7 @@ export default function TransactionsPage() {
                 <Clock className="h-4 w-4 mr-2" />
                 Requests
                 <Badge variant="secondary" className="ml-2">
-                  {pendingRequests.length}
+                  {pendingTransactions.length}
                 </Badge>
               </TabsTrigger>
               <TabsTrigger value="active">
@@ -134,7 +134,7 @@ export default function TransactionsPage() {
             {/* Pending Requests */}
             <TabsContent value="requests" className="mt-6">
               <div className="space-y-4">
-                {pendingRequests.map((request) => (
+                {pendingTransactions.map((request) => (
                   <Link key={request.id} href={`/transactions/${request.id}`}>
                     <Card className="cursor-pointer hover:border-primary/50 transition-colors">
                       <CardContent className="p-6">
