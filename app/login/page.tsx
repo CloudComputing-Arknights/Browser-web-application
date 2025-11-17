@@ -1,7 +1,8 @@
+
 "use client"
 
 import type React from "react"
-
+import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,13 +15,24 @@ import { loginUser } from "@/lib/auth"
 export default function LoginPage() {
   const router = useRouter()
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Call placeholder login function (always returns true)
-    const success = loginUser()
+    setError(null)
+    setLoading(true)
+
+    const success = await loginUser(username, password)
+
+    setLoading(false)
+
     if (success) {
-      // Redirect to home page
       router.push("/")
+    } else {
+      setError("Invalid username or password.")
     }
   }
 
@@ -45,8 +57,16 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="you@example.com" required />
+                {/* 🔹 Changed Email → Username */}
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="yourusername"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -55,12 +75,20 @@ export default function LoginPage() {
                     Forgot password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
+
+              {error && <p className="text-sm text-red-500">{error}</p>}
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
               </Button>
               <p className="text-sm text-center text-muted-foreground">
                 Don't have an account?{" "}
