@@ -130,3 +130,13 @@ export async function registerUser(payload: RegisterRequest): Promise<boolean> {
     return false
   }
 }
+
+export function logoutUser(): void {
+  setUserLoggedIn(false)
+
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("access_token")
+    localStorage.removeItem("token_type")
+
+  }
+}
