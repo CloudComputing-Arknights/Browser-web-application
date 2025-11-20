@@ -1,19 +1,19 @@
 import axios, {AxiosInstance} from 'axios';
 import {Configuration} from "@/client";
 
-export const defaultAPIBaseURLs = process.env.NEXT_PUBLIC_API_BASE_URL!;
+export const defaultAPIBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
 
 export function getAxiosInstance(): AxiosInstance {
   return axios.create({
-    baseURL: defaultAPIBaseURLs
+    baseURL: defaultAPIBaseURL
   });
 }
 
 export function getOpenAPIConfiguration(): Configuration {
   const token = localStorage.getItem("token");
   return new Configuration({
-    basePath: defaultAPIBaseURLs,
+    basePath: defaultAPIBaseURL,
     accessToken: token || undefined,
   });
 }
