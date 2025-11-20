@@ -54,3 +54,8 @@ Follow these steps to set up and run the project locally:
 
 8. If everything works as expected, upload the contents of the `/out` folder to your Google Cloud Storage bucket. Then, navigate to `https://your-bucket-name.storage.googleapis.com/index.html` in your browser (ensure the bucket allows public access).
 
+### OpenAPI Client
+
+```bash
+openapi-generator-cli generate -i openapi.json -g typescript-axios -o client
+```
