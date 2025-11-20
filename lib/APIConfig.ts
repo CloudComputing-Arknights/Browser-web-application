@@ -17,3 +17,15 @@ export function getOpenAPIConfiguration(): Configuration {
     accessToken: token || undefined,
   });
 }
+
+/*
+* Example for getOpenAPIConfiguration():
+*   async demoRequest(email: string, password: string): Promise<string> {
+    const api = new AuthApi(getOpenAPIConfiguration());
+    const res = await api.demoLogin({
+      email: email,
+      password: password
+    });
+    return res.data.accessToken;
+  }
+* */
