@@ -11,7 +11,7 @@ export function getAxiosInstance(): AxiosInstance {
 }
 
 export function getOpenAPIConfiguration(): Configuration {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("access_token");
   return new Configuration({
     basePath: defaultAPIBaseURL,
     accessToken: token || undefined,
