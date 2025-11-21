@@ -1,9 +1,8 @@
 "use client"
 
-import type { GetStaticPaths, GetStaticProps } from "next"
 import type React from "react"
+import {isLoggedIn, fetchCurrentUser} from "@/lib/auth"
 
-import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -16,8 +15,12 @@ import { ArrowRightLeft, DollarSign, Package } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { mockItems } from "@/lib/mock-data"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+
+
+
+
 
 
 type Item = (typeof mockItems)[0]
@@ -31,6 +34,28 @@ export default function RequestTradeClient({ item }: RequestTradeClientProps) { 
   const [selectedItem, setSelectedItem] = useState("")
   const [offerPrice, setOfferPrice] = useState("")
   const [message, setMessage] = useState("")
+  const [currentUserid, setCurrentUserid] = useState<string | null>(null)
+  if(!isLoggedIn) {
+    console.log("not logged in")
+    const router = useRouter()
+    router.push("/login")
+    return null
+  }
+  console.log("logged in")
+  useEffect(() => {
+    async function getUserId() {
+      try {
+        const user = await fetchCurrentUser()
+        setCurrentUserid(user.id)
+      } catch (err) {
+        setCurrentUserid(null)
+        router.push("/login")
+        return null
+      }
+    }
+    getUserId()
+    console.log("currentUserid", currentUserid)
+  }, [])
 
   // Mock target item data
   const targetItem = {

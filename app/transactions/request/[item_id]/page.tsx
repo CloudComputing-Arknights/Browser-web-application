@@ -1,6 +1,8 @@
 import { Header } from "@/components/header" // Only for this page.tsx, if Header is already globally defined in layout, please remove this line
 import { mockItems } from "@/lib/mock-data"
 import RequestTradeClient from "./RequestTradeClient" // Import the new client component
+import { isLoggedIn } from "@/lib/auth"
+import { useRouter } from "next/navigation"
 
 
 interface RequestTradePageProps {
@@ -18,6 +20,7 @@ export async function generateStaticParams() {
 
 // 2. Async Page component replaces getStaticProps
 export default async function RequestTradePage({ params }: RequestTradePageProps) {
+
   // Key modification: Fix 'params should be awaited' error and maintain type safety
   const awaitedParams = await params;
   const itemId = awaitedParams.item_id.toString()
