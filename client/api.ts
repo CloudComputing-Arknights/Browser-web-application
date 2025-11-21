@@ -245,245 +245,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
     return {
         /**
          * 
-         * @summary Auth Me
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authMeMeUserGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/me/user`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Create Transaction
-         * @param {CreateTransactionReq} createTransactionReq 
-         * @param {string | null} [xIdempotencyKey] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createTransactionTransactionsTransactionPost: async (createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createTransactionReq' is not null or undefined
-            assertParamExists('createTransactionTransactionsTransactionPost', 'createTransactionReq', createTransactionReq)
-            const localVarPath = `/transactions/transaction`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            if (xIdempotencyKey != null) {
-                localVarHeaderParameter['X-Idempotency-Key'] = String(xIdempotencyKey);
-            }
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createTransactionReq, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Create User
-         * @param {SignUpReq} signUpReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createUserUsersPost: async (signUpReq: SignUpReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'signUpReq' is not null or undefined
-            assertParamExists('createUserUsersPost', 'signUpReq', signUpReq)
-            const localVarPath = `/users`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(signUpReq, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Delete Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteTransactionTransactionsTransactionIdDelete: async (transactionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'transactionId' is not null or undefined
-            assertParamExists('deleteTransactionTransactionsTransactionIdDelete', 'transactionId', transactionId)
-            const localVarPath = `/transactions/{transaction_id}`
-                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Get Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getTransactionTransactionsTransactionIdGet: async (transactionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'transactionId' is not null or undefined
-            assertParamExists('getTransactionTransactionsTransactionIdGet', 'transactionId', transactionId)
-            const localVarPath = `/transactions/{transaction_id}`
-                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary List Transactions
-         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
-         * @param {string | null} [initiatorUserId] 
-         * @param {string | null} [receiverUserId] 
-         * @param {string | null} [requestedItemId] 
-         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
-         * @param {number} [limit] 
-         * @param {number} [offset] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listTransactionsTransactionsGet: async (statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/transactions`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            if (statusParam !== undefined) {
-                localVarQueryParameter['status_param'] = statusParam;
-            }
-
-            if (initiatorUserId !== undefined) {
-                localVarQueryParameter['initiator_user_id'] = initiatorUserId;
-            }
-
-            if (receiverUserId !== undefined) {
-                localVarQueryParameter['receiver_user_id'] = receiverUserId;
-            }
-
-            if (requestedItemId !== undefined) {
-                localVarQueryParameter['requested_item_id'] = requestedItemId;
-            }
-
-            if (type !== undefined) {
-                localVarQueryParameter['type'] = type;
-            }
-
-            if (limit !== undefined) {
-                localVarQueryParameter['limit'] = limit;
-            }
-
-            if (offset !== undefined) {
-                localVarQueryParameter['offset'] = offset;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
          * @summary Root
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -512,82 +273,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * 
-         * @summary Sign In
-         * @param {SignInReq} signInReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signInTokenPost: async (signInReq: SignInReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'signInReq' is not null or undefined
-            assertParamExists('signInTokenPost', 'signInReq', signInReq)
-            const localVarPath = `/token`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(signInReq, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * 
-         * @summary Update Transaction
-         * @param {string} transactionId 
-         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateTransactionTransactionsTransactionIdPut: async (transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'transactionId' is not null or undefined
-            assertParamExists('updateTransactionTransactionsTransactionIdPut', 'transactionId', transactionId)
-            // verify required parameter 'updateTransactionStatusReq' is not null or undefined
-            assertParamExists('updateTransactionTransactionsTransactionIdPut', 'updateTransactionStatusReq', updateTransactionStatusReq)
-            const localVarPath = `/transactions/{transaction_id}`
-                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateTransactionStatusReq, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -599,90 +284,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
-         * @summary Auth Me
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async authMeMeUserGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignedInUserRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.authMeMeUserGet(options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.authMeMeUserGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Create Transaction
-         * @param {CreateTransactionReq} createTransactionReq 
-         * @param {string | null} [xIdempotencyKey] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createTransactionTransactionsTransactionPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Create User
-         * @param {SignUpReq} signUpReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignedInUserRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createUserUsersPost(signUpReq, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createUserUsersPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Delete Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTransactionTransactionsTransactionIdDelete(transactionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deleteTransactionTransactionsTransactionIdDelete']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Get Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionTransactionsTransactionIdGet(transactionId, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getTransactionTransactionsTransactionIdGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary List Transactions
-         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
-         * @param {string | null} [initiatorUserId] 
-         * @param {string | null} [receiverUserId] 
-         * @param {string | null} [requestedItemId] 
-         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
-         * @param {number} [limit] 
-         * @param {number} [offset] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TransactionRes>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listTransactionsTransactionsGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
          * @summary Root
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -691,33 +292,6 @@ export const DefaultApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.rootGet(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['DefaultApi.rootGet']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Sign In
-         * @param {SignInReq} signInReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignInRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.signInTokenPost(signInReq, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.signInTokenPost']?.[localVarOperationServerIndex]?.url;
-            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
-        },
-        /**
-         * 
-         * @summary Update Transaction
-         * @param {string} transactionId 
-         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options);
-            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['DefaultApi.updateTransactionTransactionsTransactionIdPut']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -731,99 +305,12 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     return {
         /**
          * 
-         * @summary Auth Me
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        authMeMeUserGet(options?: RawAxiosRequestConfig): AxiosPromise<SignedInUserRes> {
-            return localVarFp.authMeMeUserGet(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Create Transaction
-         * @param {CreateTransactionReq} createTransactionReq 
-         * @param {string | null} [xIdempotencyKey] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
-            return localVarFp.createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Create User
-         * @param {SignUpReq} signUpReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig): AxiosPromise<SignedInUserRes> {
-            return localVarFp.createUserUsersPost(signUpReq, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Delete Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
-            return localVarFp.deleteTransactionTransactionsTransactionIdDelete(transactionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Get Transaction
-         * @param {string} transactionId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
-            return localVarFp.getTransactionTransactionsTransactionIdGet(transactionId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary List Transactions
-         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
-         * @param {string | null} [initiatorUserId] 
-         * @param {string | null} [receiverUserId] 
-         * @param {string | null} [requestedItemId] 
-         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
-         * @param {number} [limit] 
-         * @param {number} [offset] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<TransactionRes>> {
-            return localVarFp.listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
          * @summary Root
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         rootGet(options?: RawAxiosRequestConfig): AxiosPromise<any> {
             return localVarFp.rootGet(options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Sign In
-         * @param {SignInReq} signInReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig): AxiosPromise<SignInRes> {
-            return localVarFp.signInTokenPost(signInReq, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * 
-         * @summary Update Transaction
-         * @param {string} transactionId 
-         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
-            return localVarFp.updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -834,78 +321,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 export class DefaultApi extends BaseAPI {
     /**
      * 
-     * @summary Auth Me
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public authMeMeUserGet(options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).authMeMeUserGet(options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Create Transaction
-     * @param {CreateTransactionReq} createTransactionReq 
-     * @param {string | null} [xIdempotencyKey] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Create User
-     * @param {SignUpReq} signUpReq 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).createUserUsersPost(signUpReq, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Delete Transaction
-     * @param {string} transactionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).deleteTransactionTransactionsTransactionIdDelete(transactionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Get Transaction
-     * @param {string} transactionId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).getTransactionTransactionsTransactionIdGet(transactionId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary List Transactions
-     * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
-     * @param {string | null} [initiatorUserId] 
-     * @param {string | null} [receiverUserId] 
-     * @param {string | null} [requestedItemId] 
-     * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
-     * @param {number} [limit] 
-     * @param {number} [offset] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
      * @summary Root
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -913,50 +328,14 @@ export class DefaultApi extends BaseAPI {
     public rootGet(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).rootGet(options).then((request) => request(this.axios, this.basePath));
     }
-
-    /**
-     * 
-     * @summary Sign In
-     * @param {SignInReq} signInReq 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).signInTokenPost(signInReq, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * 
-     * @summary Update Transaction
-     * @param {string} transactionId 
-     * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    public updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig) {
-        return DefaultApiFp(this.configuration).updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options).then((request) => request(this.axios, this.basePath));
-    }
 }
 
-export const ListTransactionsTransactionsGetStatusParamEnum = {
-    Pending: 'pending',
-    Accepted: 'accepted',
-    Rejected: 'rejected',
-    Canceled: 'canceled',
-    Completed: 'completed'
-} as const;
-export type ListTransactionsTransactionsGetStatusParamEnum = typeof ListTransactionsTransactionsGetStatusParamEnum[keyof typeof ListTransactionsTransactionsGetStatusParamEnum];
-export const ListTransactionsTransactionsGetTypeEnum = {
-    Trade: 'trade',
-    Purchase: 'purchase'
-} as const;
-export type ListTransactionsTransactionsGetTypeEnum = typeof ListTransactionsTransactionsGetTypeEnum[keyof typeof ListTransactionsTransactionsGetTypeEnum];
 
 
 /**
- * ItemUserRouterApi - axios parameter creator
+ * ItemUserApi - axios parameter creator
  */
-export const ItemUserRouterApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ItemUserApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * 
@@ -1020,6 +399,10 @@ export const ItemUserRouterApiAxiosParamCreator = function (configuration?: Conf
             const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
+
+            // authentication HTTPBearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
@@ -1168,10 +551,10 @@ export const ItemUserRouterApiAxiosParamCreator = function (configuration?: Conf
 };
 
 /**
- * ItemUserRouterApi - functional programming interface
+ * ItemUserApi - functional programming interface
  */
-export const ItemUserRouterApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = ItemUserRouterApiAxiosParamCreator(configuration)
+export const ItemUserApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = ItemUserApiAxiosParamCreator(configuration)
     return {
         /**
          * 
@@ -1183,7 +566,7 @@ export const ItemUserRouterApiFp = function(configuration?: Configuration) {
         async createItemForMeMeItemsPost(createOwnItemReq: CreateOwnItemReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobRead>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createItemForMeMeItemsPost(createOwnItemReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ItemUserRouterApi.createItemForMeMeItemsPost']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ItemUserApi.createItemForMeMeItemsPost']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1196,7 +579,7 @@ export const ItemUserRouterApiFp = function(configuration?: Configuration) {
         async deleteMyItemMeItemsItemIdDelete(itemId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteMyItemMeItemsItemIdDelete(itemId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ItemUserRouterApi.deleteMyItemMeItemsItemIdDelete']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ItemUserApi.deleteMyItemMeItemsItemIdDelete']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1209,7 +592,7 @@ export const ItemUserRouterApiFp = function(configuration?: Configuration) {
         async getMyJobStatusMeItemsJobsJobIdGet(jobId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobRead>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getMyJobStatusMeItemsJobsJobIdGet(jobId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ItemUserRouterApi.getMyJobStatusMeItemsJobsJobIdGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ItemUserApi.getMyJobStatusMeItemsJobsJobIdGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1223,7 +606,7 @@ export const ItemUserRouterApiFp = function(configuration?: Configuration) {
         async listMyItemsMeItemsGet(skip?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<any>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listMyItemsMeItemsGet(skip, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ItemUserRouterApi.listMyItemsMeItemsGet']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ItemUserApi.listMyItemsMeItemsGet']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1238,17 +621,17 @@ export const ItemUserRouterApiFp = function(configuration?: Configuration) {
         async updateMyItemMeItemsItemIdPatch(itemId: string, ifMatch: string, updateOwnItemReq: UpdateOwnItemReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ItemRead>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateMyItemMeItemsItemIdPatch(itemId, ifMatch, updateOwnItemReq, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['ItemUserRouterApi.updateMyItemMeItemsItemIdPatch']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['ItemUserApi.updateMyItemMeItemsItemIdPatch']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
- * ItemUserRouterApi - factory interface
+ * ItemUserApi - factory interface
  */
-export const ItemUserRouterApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = ItemUserRouterApiFp(configuration)
+export const ItemUserApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = ItemUserApiFp(configuration)
     return {
         /**
          * 
@@ -1307,9 +690,9 @@ export const ItemUserRouterApiFactory = function (configuration?: Configuration,
 };
 
 /**
- * ItemUserRouterApi - object-oriented interface
+ * ItemUserApi - object-oriented interface
  */
-export class ItemUserRouterApi extends BaseAPI {
+export class ItemUserApi extends BaseAPI {
     /**
      * 
      * @summary Create Item For Me
@@ -1318,7 +701,7 @@ export class ItemUserRouterApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public createItemForMeMeItemsPost(createOwnItemReq: CreateOwnItemReq, options?: RawAxiosRequestConfig) {
-        return ItemUserRouterApiFp(this.configuration).createItemForMeMeItemsPost(createOwnItemReq, options).then((request) => request(this.axios, this.basePath));
+        return ItemUserApiFp(this.configuration).createItemForMeMeItemsPost(createOwnItemReq, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1329,7 +712,7 @@ export class ItemUserRouterApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public deleteMyItemMeItemsItemIdDelete(itemId: string, options?: RawAxiosRequestConfig) {
-        return ItemUserRouterApiFp(this.configuration).deleteMyItemMeItemsItemIdDelete(itemId, options).then((request) => request(this.axios, this.basePath));
+        return ItemUserApiFp(this.configuration).deleteMyItemMeItemsItemIdDelete(itemId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1340,7 +723,7 @@ export class ItemUserRouterApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public getMyJobStatusMeItemsJobsJobIdGet(jobId: string, options?: RawAxiosRequestConfig) {
-        return ItemUserRouterApiFp(this.configuration).getMyJobStatusMeItemsJobsJobIdGet(jobId, options).then((request) => request(this.axios, this.basePath));
+        return ItemUserApiFp(this.configuration).getMyJobStatusMeItemsJobsJobIdGet(jobId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1352,7 +735,7 @@ export class ItemUserRouterApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public listMyItemsMeItemsGet(skip?: number, limit?: number, options?: RawAxiosRequestConfig) {
-        return ItemUserRouterApiFp(this.configuration).listMyItemsMeItemsGet(skip, limit, options).then((request) => request(this.axios, this.basePath));
+        return ItemUserApiFp(this.configuration).listMyItemsMeItemsGet(skip, limit, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1365,7 +748,7 @@ export class ItemUserRouterApi extends BaseAPI {
      * @throws {RequiredError}
      */
     public updateMyItemMeItemsItemIdPatch(itemId: string, ifMatch: string, updateOwnItemReq: UpdateOwnItemReq, options?: RawAxiosRequestConfig) {
-        return ItemUserRouterApiFp(this.configuration).updateMyItemMeItemsItemIdPatch(itemId, ifMatch, updateOwnItemReq, options).then((request) => request(this.axios, this.basePath));
+        return ItemUserApiFp(this.configuration).updateMyItemMeItemsItemIdPatch(itemId, ifMatch, updateOwnItemReq, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -1411,10 +794,50 @@ export const ItemsApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * 
+         * @summary List Categories
+         * @param {number} [skip] Number of items to skip
+         * @param {number} [limit] Max number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategoriesItemsCategoriesGet: async (skip?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/items/categories`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (skip !== undefined) {
+                localVarQueryParameter['skip'] = skip;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
          * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
-         * @param {string | null} [categoryId] Filter by item\&#39;s category
+         * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
          * @param {string | null} [search] Search by item title (case-insensitive, partial match)
          * @param {number} [skip] Number of items to skip
@@ -1422,7 +845,7 @@ export const ItemsApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPublicItemsItemsGet: async (id?: Array<string> | null, categoryId?: string | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPublicItemsItemsGet: async (id?: Array<string> | null, categoryId?: number | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/items/`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -1493,10 +916,24 @@ export const ItemsApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * 
+         * @summary List Categories
+         * @param {number} [skip] Number of items to skip
+         * @param {number} [limit] Max number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listCategoriesItemsCategoriesGet(skip?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<CategoryRead>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listCategoriesItemsCategoriesGet(skip, limit, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ItemsApi.listCategoriesItemsCategoriesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
          * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
-         * @param {string | null} [categoryId] Filter by item\&#39;s category
+         * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
          * @param {string | null} [search] Search by item title (case-insensitive, partial match)
          * @param {number} [skip] Number of items to skip
@@ -1504,7 +941,7 @@ export const ItemsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: string | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ItemRead>>> {
+        async listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: number | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<ItemRead>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listPublicItemsItemsGet(id, categoryId, transactionType, search, skip, limit, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ItemsApi.listPublicItemsItemsGet']?.[localVarOperationServerIndex]?.url;
@@ -1530,10 +967,21 @@ export const ItemsApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.getPublicItemByIdItemsItemIdGet(itemId, options).then((request) => request(axios, basePath));
         },
         /**
+         * 
+         * @summary List Categories
+         * @param {number} [skip] Number of items to skip
+         * @param {number} [limit] Max number of items to return
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listCategoriesItemsCategoriesGet(skip?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<CategoryRead>> {
+            return localVarFp.listCategoriesItemsCategoriesGet(skip, limit, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
          * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
-         * @param {string | null} [categoryId] Filter by item\&#39;s category
+         * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
          * @param {string | null} [search] Search by item title (case-insensitive, partial match)
          * @param {number} [skip] Number of items to skip
@@ -1541,7 +989,7 @@ export const ItemsApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: string | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ItemRead>> {
+        listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: number | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<ItemRead>> {
             return localVarFp.listPublicItemsItemsGet(id, categoryId, transactionType, search, skip, limit, options).then((request) => request(axios, basePath));
         },
     };
@@ -1563,10 +1011,22 @@ export class ItemsApi extends BaseAPI {
     }
 
     /**
+     * 
+     * @summary List Categories
+     * @param {number} [skip] Number of items to skip
+     * @param {number} [limit] Max number of items to return
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listCategoriesItemsCategoriesGet(skip?: number, limit?: number, options?: RawAxiosRequestConfig) {
+        return ItemsApiFp(this.configuration).listCategoriesItemsCategoriesGet(skip, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get items through pagination, can be filtered by ID, category, condition, transaction type
      * @summary Get items through pagination.
      * @param {Array<string> | null} [id] Filter by a list of item IDs
-     * @param {string | null} [categoryId] Filter by item\&#39;s category
+     * @param {number | null} [categoryId] Filter by item\&#39;s category
      * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
      * @param {string | null} [search] Search by item title (case-insensitive, partial match)
      * @param {number} [skip] Number of items to skip
@@ -1574,8 +1034,699 @@ export class ItemsApi extends BaseAPI {
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    public listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: string | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig) {
+    public listPublicItemsItemsGet(id?: Array<string> | null, categoryId?: number | null, transactionType?: TransactionType | null, search?: string | null, skip?: number, limit?: number, options?: RawAxiosRequestConfig) {
         return ItemsApiFp(this.configuration).listPublicItemsItemsGet(id, categoryId, transactionType, search, skip, limit, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * TransactionApi - axios parameter creator
+ */
+export const TransactionApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Create Transaction
+         * @param {CreateTransactionReq} createTransactionReq 
+         * @param {string | null} [xIdempotencyKey] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createTransactionTransactionsTransactionPost: async (createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createTransactionReq' is not null or undefined
+            assertParamExists('createTransactionTransactionsTransactionPost', 'createTransactionReq', createTransactionReq)
+            const localVarPath = `/transactions/transaction`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            if (xIdempotencyKey != null) {
+                localVarHeaderParameter['X-Idempotency-Key'] = String(xIdempotencyKey);
+            }
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createTransactionReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTransactionTransactionsTransactionIdDelete: async (transactionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'transactionId' is not null or undefined
+            assertParamExists('deleteTransactionTransactionsTransactionIdDelete', 'transactionId', transactionId)
+            const localVarPath = `/transactions/{transaction_id}`
+                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Get Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionTransactionsTransactionIdGet: async (transactionId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'transactionId' is not null or undefined
+            assertParamExists('getTransactionTransactionsTransactionIdGet', 'transactionId', transactionId)
+            const localVarPath = `/transactions/{transaction_id}`
+                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary List Transactions
+         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
+         * @param {string | null} [initiatorUserId] 
+         * @param {string | null} [receiverUserId] 
+         * @param {string | null} [requestedItemId] 
+         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTransactionsTransactionsGet: async (statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/transactions`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (statusParam !== undefined) {
+                localVarQueryParameter['status_param'] = statusParam;
+            }
+
+            if (initiatorUserId !== undefined) {
+                localVarQueryParameter['initiator_user_id'] = initiatorUserId;
+            }
+
+            if (receiverUserId !== undefined) {
+                localVarQueryParameter['receiver_user_id'] = receiverUserId;
+            }
+
+            if (requestedItemId !== undefined) {
+                localVarQueryParameter['requested_item_id'] = requestedItemId;
+            }
+
+            if (type !== undefined) {
+                localVarQueryParameter['type'] = type;
+            }
+
+            if (limit !== undefined) {
+                localVarQueryParameter['limit'] = limit;
+            }
+
+            if (offset !== undefined) {
+                localVarQueryParameter['offset'] = offset;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update Transaction
+         * @param {string} transactionId 
+         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateTransactionTransactionsTransactionIdPut: async (transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'transactionId' is not null or undefined
+            assertParamExists('updateTransactionTransactionsTransactionIdPut', 'transactionId', transactionId)
+            // verify required parameter 'updateTransactionStatusReq' is not null or undefined
+            assertParamExists('updateTransactionTransactionsTransactionIdPut', 'updateTransactionStatusReq', updateTransactionStatusReq)
+            const localVarPath = `/transactions/{transaction_id}`
+                .replace(`{${"transaction_id"}}`, encodeURIComponent(String(transactionId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateTransactionStatusReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * TransactionApi - functional programming interface
+ */
+export const TransactionApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = TransactionApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Transaction
+         * @param {CreateTransactionReq} createTransactionReq 
+         * @param {string | null} [xIdempotencyKey] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.createTransactionTransactionsTransactionPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Delete Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTransactionTransactionsTransactionIdDelete(transactionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.deleteTransactionTransactionsTransactionIdDelete']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Get Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getTransactionTransactionsTransactionIdGet(transactionId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.getTransactionTransactionsTransactionIdGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary List Transactions
+         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
+         * @param {string | null} [initiatorUserId] 
+         * @param {string | null} [receiverUserId] 
+         * @param {string | null} [requestedItemId] 
+         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TransactionRes>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.listTransactionsTransactionsGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update Transaction
+         * @param {string} transactionId 
+         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TransactionRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.updateTransactionTransactionsTransactionIdPut']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * TransactionApi - factory interface
+ */
+export const TransactionApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = TransactionApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Create Transaction
+         * @param {CreateTransactionReq} createTransactionReq 
+         * @param {string | null} [xIdempotencyKey] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
+            return localVarFp.createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
+            return localVarFp.deleteTransactionTransactionsTransactionIdDelete(transactionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get Transaction
+         * @param {string} transactionId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
+            return localVarFp.getTransactionTransactionsTransactionIdGet(transactionId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List Transactions
+         * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
+         * @param {string | null} [initiatorUserId] 
+         * @param {string | null} [receiverUserId] 
+         * @param {string | null} [requestedItemId] 
+         * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
+         * @param {number} [limit] 
+         * @param {number} [offset] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig): AxiosPromise<Array<TransactionRes>> {
+            return localVarFp.listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update Transaction
+         * @param {string} transactionId 
+         * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig): AxiosPromise<TransactionRes> {
+            return localVarFp.updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * TransactionApi - object-oriented interface
+ */
+export class TransactionApi extends BaseAPI {
+    /**
+     * 
+     * @summary Create Transaction
+     * @param {CreateTransactionReq} createTransactionReq 
+     * @param {string | null} [xIdempotencyKey] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createTransactionTransactionsTransactionPost(createTransactionReq: CreateTransactionReq, xIdempotencyKey?: string | null, options?: RawAxiosRequestConfig) {
+        return TransactionApiFp(this.configuration).createTransactionTransactionsTransactionPost(createTransactionReq, xIdempotencyKey, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Transaction
+     * @param {string} transactionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteTransactionTransactionsTransactionIdDelete(transactionId: string, options?: RawAxiosRequestConfig) {
+        return TransactionApiFp(this.configuration).deleteTransactionTransactionsTransactionIdDelete(transactionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Transaction
+     * @param {string} transactionId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public getTransactionTransactionsTransactionIdGet(transactionId: string, options?: RawAxiosRequestConfig) {
+        return TransactionApiFp(this.configuration).getTransactionTransactionsTransactionIdGet(transactionId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List Transactions
+     * @param {ListTransactionsTransactionsGetStatusParamEnum} [statusParam] 
+     * @param {string | null} [initiatorUserId] 
+     * @param {string | null} [receiverUserId] 
+     * @param {string | null} [requestedItemId] 
+     * @param {ListTransactionsTransactionsGetTypeEnum} [type] 
+     * @param {number} [limit] 
+     * @param {number} [offset] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public listTransactionsTransactionsGet(statusParam?: ListTransactionsTransactionsGetStatusParamEnum, initiatorUserId?: string | null, receiverUserId?: string | null, requestedItemId?: string | null, type?: ListTransactionsTransactionsGetTypeEnum, limit?: number, offset?: number, options?: RawAxiosRequestConfig) {
+        return TransactionApiFp(this.configuration).listTransactionsTransactionsGet(statusParam, initiatorUserId, receiverUserId, requestedItemId, type, limit, offset, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update Transaction
+     * @param {string} transactionId 
+     * @param {UpdateTransactionStatusReq} updateTransactionStatusReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public updateTransactionTransactionsTransactionIdPut(transactionId: string, updateTransactionStatusReq: UpdateTransactionStatusReq, options?: RawAxiosRequestConfig) {
+        return TransactionApiFp(this.configuration).updateTransactionTransactionsTransactionIdPut(transactionId, updateTransactionStatusReq, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+export const ListTransactionsTransactionsGetStatusParamEnum = {
+    Pending: 'pending',
+    Accepted: 'accepted',
+    Rejected: 'rejected',
+    Canceled: 'canceled',
+    Completed: 'completed'
+} as const;
+export type ListTransactionsTransactionsGetStatusParamEnum = typeof ListTransactionsTransactionsGetStatusParamEnum[keyof typeof ListTransactionsTransactionsGetStatusParamEnum];
+export const ListTransactionsTransactionsGetTypeEnum = {
+    Trade: 'trade',
+    Purchase: 'purchase'
+} as const;
+export type ListTransactionsTransactionsGetTypeEnum = typeof ListTransactionsTransactionsGetTypeEnum[keyof typeof ListTransactionsTransactionsGetTypeEnum];
+
+
+/**
+ * UserApi - axios parameter creator
+ */
+export const UserApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Auth Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authMeMeUserGet: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/me/user`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication HTTPBearer required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Create User
+         * @param {SignUpReq} signUpReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createUserUsersPost: async (signUpReq: SignUpReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'signUpReq' is not null or undefined
+            assertParamExists('createUserUsersPost', 'signUpReq', signUpReq)
+            const localVarPath = `/users`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(signUpReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Sign In
+         * @param {SignInReq} signInReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        signInTokenPost: async (signInReq: SignInReq, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'signInReq' is not null or undefined
+            assertParamExists('signInTokenPost', 'signInReq', signInReq)
+            const localVarPath = `/token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(signInReq, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UserApi - functional programming interface
+ */
+export const UserApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UserApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Auth Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async authMeMeUserGet(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignedInUserRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.authMeMeUserGet(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.authMeMeUserGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Create User
+         * @param {SignUpReq} signUpReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignedInUserRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createUserUsersPost(signUpReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.createUserUsersPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Sign In
+         * @param {SignInReq} signInReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SignInRes>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.signInTokenPost(signInReq, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UserApi.signInTokenPost']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UserApi - factory interface
+ */
+export const UserApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UserApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Auth Me
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        authMeMeUserGet(options?: RawAxiosRequestConfig): AxiosPromise<SignedInUserRes> {
+            return localVarFp.authMeMeUserGet(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Create User
+         * @param {SignUpReq} signUpReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig): AxiosPromise<SignedInUserRes> {
+            return localVarFp.createUserUsersPost(signUpReq, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Sign In
+         * @param {SignInReq} signInReq 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig): AxiosPromise<SignInRes> {
+            return localVarFp.signInTokenPost(signInReq, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UserApi - object-oriented interface
+ */
+export class UserApi extends BaseAPI {
+    /**
+     * 
+     * @summary Auth Me
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public authMeMeUserGet(options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).authMeMeUserGet(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Create User
+     * @param {SignUpReq} signUpReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createUserUsersPost(signUpReq: SignUpReq, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).createUserUsersPost(signUpReq, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Sign In
+     * @param {SignInReq} signInReq 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public signInTokenPost(signInReq: SignInReq, options?: RawAxiosRequestConfig) {
+        return UserApiFp(this.configuration).signInTokenPost(signInReq, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

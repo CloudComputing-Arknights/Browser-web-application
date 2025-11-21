@@ -1,6 +1,5 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 api.ts
 base.ts
 common.ts
@@ -13,7 +12,7 @@ docs/CreateTransactionReq.md
 docs/DefaultApi.md
 docs/HTTPValidationError.md
 docs/ItemRead.md
-docs/ItemUserRouterApi.md
+docs/ItemUserApi.md
 docs/ItemsApi.md
 docs/JobRead.md
 docs/JobStatus.md
@@ -21,10 +20,12 @@ docs/SignInReq.md
 docs/SignInRes.md
 docs/SignUpReq.md
 docs/SignedInUserRes.md
+docs/TransactionApi.md
 docs/TransactionRes.md
 docs/TransactionType.md
 docs/UpdateOwnItemReq.md
 docs/UpdateTransactionStatusReq.md
+docs/UserApi.md
 docs/ValidationError.md
 docs/ValidationErrorLocInner.md
 git_push.sh
