@@ -3,7 +3,7 @@
 // Simple client-side auth state management
 // In a real app, this would use proper authentication with sessions/tokens
 
-let isLoggedIn = false
+export let isLoggedIn = false
 
 export function isUserLoggedIn(): boolean {
   if (typeof window !== "undefined") {
