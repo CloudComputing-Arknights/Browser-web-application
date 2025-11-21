@@ -28,9 +28,6 @@ export default function ItemDetailClient({ item }: ItemDetailClientProps) {
   
   // Item data is now received from props instead of being hardcoded
 
-  // State management for trade requests and comments
-  // Trade request status: pending, accepted, declined, cancelled, completed
-  const [tradeStatus, setTradeStatus] = useState<string | null>(null)
   
   // Comments list - in production, this would be fetched from an API
   const [comments, setComments] = useState([
@@ -47,13 +44,6 @@ export default function ItemDetailClient({ item }: ItemDetailClientProps) {
   // New comment input state
   const [newComment, setNewComment] = useState("")
 
-  // Mock trade request data - in production, this would come from props or API
-  const tradeRequest = {
-    id: 101,
-    status: "pending", // Possible values: pending, accepted, declined, completed
-    offeredItem: "Laptop Stand",
-    offeredPrice: null,
-  }
 
   // Navigate to messages page with seller information
   const handleMessageSeller = () => {
@@ -61,30 +51,6 @@ export default function ItemDetailClient({ item }: ItemDetailClientProps) {
     router.push(`/messages?seller=${item.seller.name}`)
   }
 
-  // Accept a pending trade request
-  const handleAcceptTrade = () => {
-    console.log("[v0] Accept Trade clicked for trade request:", tradeRequest.id)
-    setTradeStatus("accepted")
-    // In production, this would call an API to update the trade status
-  }
-
-  // Decline a pending trade request
-  const handleDeclineTrade = () => {
-    setTradeStatus("declined")
-    // In production, this would call an API to update the trade status
-  }
-
-  // Cancel an active trade request
-  const handleCancelRequest = () => {
-    setTradeStatus("cancelled")
-    // In production, this would call an API to cancel the trade
-  }
-
-  // Mark a trade as completed after successful exchange
-  const handleMarkComplete = () => {
-    setTradeStatus("completed")
-    // In production, this would call an API to mark the trade as complete
-  }
 
   // Post a new comment on the item
   const handlePostComment = () => {
@@ -170,46 +136,7 @@ export default function ItemDetailClient({ item }: ItemDetailClientProps) {
               </CardContent>
             </Card>
 
-            {/* Trade Request Status Card - only shown if there's an active trade */}
-            {tradeStatus && (
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Trade Request Status</h2>
-                    <Badge className="capitalize">{tradeStatus}</Badge>
-                  </div>
-                  <Separator />
-                  <div className="space-y-3">
-                    {/* Display the item being offered in trade */}
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Offered Item:</strong> {tradeRequest.offeredItem}
-                    </p>
-                    {/* Action buttons based on trade status */}
-                    {tradeStatus === "pending" && (
-                      <div className="flex gap-2">
-                        <Button onClick={handleAcceptTrade} className="flex-1">
-                          Accept Trade
-                        </Button>
-                        <Button onClick={handleDeclineTrade} variant="outline" className="flex-1 bg-transparent">
-                          Decline
-                        </Button>
-                      </div>
-                    )}
-                    {tradeStatus === "accepted" && (
-                      <Button onClick={handleMarkComplete} className="w-full">
-                        Mark as Complete
-                      </Button>
-                    )}
-                    {/* Cancel option available for pending or accepted trades */}
-                    {(tradeStatus === "pending" || tradeStatus === "accepted") && (
-                      <Button onClick={handleCancelRequest} variant="destructive" className="w-full">
-                        Cancel Request
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+
 
             {/* Comments Section - allows users to view and post comments */}
             <Card>

@@ -41,6 +41,8 @@ Follow these steps to set up and run the project locally:
    ```bash
    pnpm dev
    ```
+   (You'll need a `.env.development` file for `pnpm dev` to work, use `cp .env.production .env.development`)
+
 
 5. In your browser, go to [http://localhost:3000](http://localhost:3000) to view the app locally.
 
