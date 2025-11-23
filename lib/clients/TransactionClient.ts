@@ -1,6 +1,6 @@
 import { getOpenAPIConfiguration } from "@/lib/APIConfig";
 import {
-  TransactionApi,
+  TransactionUserItemApi,
   CreateTransactionReq,
   TransactionRes,
   UpdateTransactionStatusReq,
@@ -23,7 +23,7 @@ export default class TransactionClient {
     payload: CreateTransactionReq,
     xIdempotencyKey?: string | null
   ): Promise<TransactionRes> {
-    const api = new TransactionApi(getOpenAPIConfiguration());
+    const api = new TransactionUserItemApi(getOpenAPIConfiguration());
     const res = await api.createTransactionTransactionsTransactionPost(
       payload,
       xIdempotencyKey
@@ -32,7 +32,7 @@ export default class TransactionClient {
   }
 
   async deleteTransaction(transactionId: string): Promise<TransactionRes> {
-    const api = new TransactionApi(getOpenAPIConfiguration());
+    const api = new TransactionUserItemApi(getOpenAPIConfiguration());
     const res = await api.deleteTransactionTransactionsTransactionIdDelete(
       transactionId
     );
@@ -40,7 +40,7 @@ export default class TransactionClient {
   }
 
   async getTransaction(transactionId: string): Promise<TransactionRes> {
-    const api = new TransactionApi(getOpenAPIConfiguration());
+    const api = new TransactionUserItemApi(getOpenAPIConfiguration());
     const res = await api.getTransactionTransactionsTransactionIdGet(
       transactionId
     );
@@ -50,7 +50,7 @@ export default class TransactionClient {
   async listTransactions(
     options: ListTransactionsOptions = {}
   ): Promise<TransactionRes[]> {
-    const api = new TransactionApi(getOpenAPIConfiguration());
+    const api = new TransactionUserItemApi(getOpenAPIConfiguration());
     const {
       status,
       initiatorUserId,
@@ -76,7 +76,7 @@ export default class TransactionClient {
     transactionId: string,
     payload: UpdateTransactionStatusReq
   ): Promise<TransactionRes> {
-    const api = new TransactionApi(getOpenAPIConfiguration());
+    const api = new TransactionUserItemApi(getOpenAPIConfiguration());
     const res = await api.updateTransactionTransactionsTransactionIdPut(
       transactionId,
       payload

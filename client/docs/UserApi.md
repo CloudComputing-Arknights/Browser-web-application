@@ -6,7 +6,9 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**authMeMeUserGet**](#authmemeuserget) | **GET** /me/user | Auth Me|
 |[**createUserUsersPost**](#createuseruserspost) | **POST** /users | Create User|
+|[**getUserByIdUsersUserIdGet**](#getuserbyidusersuseridget) | **GET** /users/{user_id} | Get User By Id|
 |[**signInTokenPost**](#signintokenpost) | **POST** /token | Sign In|
+|[**updateMeMeUserPut**](#updatememeuserput) | **PUT** /me/user | Update Me|
 
 # **authMeMeUserGet**
 > SignedInUserRes authMeMeUserGet()
@@ -103,6 +105,58 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **getUserByIdUsersUserIdGet**
+> PublicUserRes getUserByIdUsersUserIdGet()
+
+Get public user information by user ID.
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+let userId: string; // (default to undefined)
+
+const { status, data } = await apiInstance.getUserByIdUsersUserIdGet(
+    userId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **userId** | [**string**] |  | defaults to undefined|
+
+
+### Return type
+
+**PublicUserRes**
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Successful Response |  -  |
+|**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **signInTokenPost**
 > SignInRes signInTokenPost(signInReq)
 
@@ -140,6 +194,58 @@ const { status, data } = await apiInstance.signInTokenPost(
 ### Authorization
 
 No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | Successful Response |  -  |
+|**422** | Validation Error |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **updateMeMeUserPut**
+> SignedInUserRes updateMeMeUserPut(updateProfileReq)
+
+
+### Example
+
+```typescript
+import {
+    UserApi,
+    Configuration,
+    UpdateProfileReq
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new UserApi(configuration);
+
+let updateProfileReq: UpdateProfileReq; //
+
+const { status, data } = await apiInstance.updateMeMeUserPut(
+    updateProfileReq
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **updateProfileReq** | **UpdateProfileReq**|  | |
+
+
+### Return type
+
+**SignedInUserRes**
+
+### Authorization
+
+[HTTPBearer](../README.md#HTTPBearer)
 
 ### HTTP request headers
 

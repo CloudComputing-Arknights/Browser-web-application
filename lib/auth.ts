@@ -1,8 +1,9 @@
 "use client"
 
-import UserClient from "@/lib/clients/UserClient"
+// Simple client-side auth state management
+// In a real app, this would use proper authentication with sessions/tokens
 
-export let isLoggedIn = false
+let isLoggedIn = false
 
 export function isUserLoggedIn(): boolean {
   if (typeof window !== "undefined") {
@@ -38,8 +39,23 @@ export async function loginUser(username: string, password: string): Promise<boo
       return false
     }
 
-    const client = new UserClient()
-    const data = (await client.signIn(username, password)) as LoginResponse
+    const res = await fetch(`${API_BASE_URL}/token`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username,
+        password,
+      }),
+    })
+
+    if (!res.ok) {
+      console.error("Login failed with status:", res.status)
+      return false
+    }
+
+    const data = (await res.json()) as LoginResponse
 
     // Store token in localStorage (simple approach for now)
     if (typeof window !== "undefined") {
@@ -62,12 +78,22 @@ export async function fetchCurrentUser() {
     throw new Error("API base URL missing")
   }
 
-  const client = new UserClient()
-  try {
-    return await client.authMe()
-  } catch (e) {
+  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null
+  if (!token) {
+    throw new Error("Not logged in")
+  }
+
+  const res = await fetch(`${API_BASE_URL}/me/user`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+
+  if (!res.ok) {
     throw new Error("Failed to fetch user")
   }
+
+  return res.json()
 }
 
 type RegisterRequest = {
@@ -83,8 +109,21 @@ export async function registerUser(payload: RegisterRequest): Promise<boolean> {
       return false
     }
 
-    const client = new UserClient()
-    await client.signUp(payload.username, payload.email, payload.password)
+    const res = await fetch(`${API_BASE_URL}/users`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!res.ok) {
+      console.error("Signup failed with status:", res.status)
+      return false
+    }
+
+    // If you want to auto-login after signup, you could parse the response here.
+    // For now, just treat success as "account created".
     return true
   } catch (err) {
     console.error("Signup error:", err)

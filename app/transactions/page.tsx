@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import { useEffect, useState } from "react"
 import { Header } from "@/components/header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -11,95 +10,257 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Clock, CheckCircle2, XCircle, ArrowRightLeft } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import TransactionClient from "@/lib/clients/TransactionClient"
+import ItemsClient from "@/lib/clients/ItemsClient"
+import UserClient from "@/lib/clients/UserClient"
+import type { TransactionRes, ItemRead, PublicUserRes } from "@/client"
+import { fetchCurrentUser, isUserLoggedIn } from "@/lib/auth"
+
+// 扩展的 Transaction 类型，包含前端需要的额外字段
+type EnrichedTransaction = TransactionRes & {
+  type_display: "received" | "sent"  // 用于判断是收到的还是发出的请求
+  requested_item?: ItemRead  // 请求的物品详细信息
+  offered_item?: ItemRead    // 提供的物品详细信息
+  initiator_user?: PublicUserRes  // 发起人用户信息
+  receiver_user?: PublicUserRes   // 接收人用户信息
+}
 
 export default function TransactionsPage() {
-  // Mock data for trade requests
-  const pendingTransactions = [
-    {
-      id: 1,
-      type: "received",
-      item: "Vintage Film Camera",
-      itemImage: "/vintage-film-camera.jpg",
-      user: "Mike Chen",
-      userAvatar: "/diverse-user-avatars.png",
-      offeredItem: "Collection of Programming Books",
-      offeredImage: "/programming-books-stack.jpg",
-      date: "2 hours ago",
-      status: "pending",
-    },
-    {
-      id: 2,
-      type: "sent",
-      item: "Office Chair",
-      itemImage: "/modern-office-chair.png",
-      user: "Emma Wilson",
-      userAvatar: "/diverse-user-avatars.png",
-      offeredItem: "Desk Lamp",
-      offeredImage: "/modern-desk-lamp.png",
-      date: "1 day ago",
-      status: "pending",
-    },
-  ]
+  const [transactions, setTransactions] = useState<EnrichedTransaction[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
-  const activeTransactions = [
-    {
-      id: 1,
-      item: "Programming Books",
-      itemImage: "/programming-books-stack.jpg",
-      user: "Alex Rodriguez",
-      userAvatar: "/diverse-user-avatars.png",
-      type: "Trade",
-      status: "accepted",
-      date: "3 days ago",
-      nextStep: "Arrange meetup",
-    },
-  ]
+  // 获取当前用户 ID 和交易列表
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        
+        // 检查登录状态
+        if (!isUserLoggedIn()) {
+          setError("Please log in to view transactions")
+          setLoading(false)
+          return
+        }
 
-  const completedTransactions = [
-    {
-      id: 1,
-      item: "Office Chair",
-      itemImage: "/modern-office-chair.png",
-      user: "Sarah Kim",
-      userAvatar: "/diverse-user-avatars.png",
-      type: "Trade",
-      completedDate: "1 week ago",
-      rating: 5,
-    },
-    {
-      id: 2,
-      item: "Desk Lamp",
-      itemImage: "/modern-desk-lamp.png",
-      user: "John Doe",
-      userAvatar: "/diverse-user-avatars.png",
-      type: "Give Away",
-      completedDate: "2 weeks ago",
-      rating: 5,
-    },
-  ]
+        // 获取当前用户信息
+        const user = await fetchCurrentUser()
+        setCurrentUserId(user.id)
 
-  const handleAcceptTrade = (e: React.MouseEvent, requestId: number) => {
-    e.preventDefault()
-    e.stopPropagation()
-    console.log(`[v0] Accept Trade clicked for request ID: ${requestId}`)
+        // 获取所有交易（后端已自动过滤当前用户相关的交易）
+        const transactionClient = new TransactionClient()
+        const data = await transactionClient.listTransactions({
+          limit: 100,
+          offset: 0,
+        })
+
+        // 获取所有相关的 Item 和 User 详细信息
+        const itemsClient = new ItemsClient()
+        const userClient = new UserClient()
+        const enrichedData: EnrichedTransaction[] = await Promise.all(
+          data.map(async (transaction) => {
+            const enriched: EnrichedTransaction = {
+              ...transaction,
+              type_display: transaction.initiator_user_id === user.id ? "sent" : "received"
+            }
+
+            // 获取 requested_item 的详细信息
+            try {
+              enriched.requested_item = await itemsClient.getItemById(transaction.requested_item_id)
+            } catch (err) {
+              console.error(`Failed to fetch item ${transaction.requested_item_id}:`, err)
+            }
+
+            // 获取 offered_item 的详细信息（如果存在）
+            if (transaction.offered_item_id) {
+              try {
+                enriched.offered_item = await itemsClient.getItemById(transaction.offered_item_id)
+              } catch (err) {
+                console.error(`Failed to fetch item ${transaction.offered_item_id}:`, err)
+              }
+            }
+
+            // 获取 initiator_user 的详细信息
+            try {
+              enriched.initiator_user = await userClient.getUserById(transaction.initiator_user_id)
+            } catch (err) {
+              console.error(`Failed to fetch user ${transaction.initiator_user_id}:`, err)
+            }
+
+            // 获取 receiver_user 的详细信息
+            try {
+              enriched.receiver_user = await userClient.getUserById(transaction.receiver_user_id)
+            } catch (err) {
+              console.error(`Failed to fetch user ${transaction.receiver_user_id}:`, err)
+            }
+
+            return enriched
+          })
+        )
+
+        setTransactions(enrichedData)
+      } catch (err) {
+        console.error("Failed to fetch transactions:", err)
+        setError("Failed to load transactions")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  // 刷新交易列表的辅助函数
+  const refreshTransactions = async () => {
+    try {
+      const transactionClient = new TransactionClient()
+      const itemsClient = new ItemsClient()
+      const userClient = new UserClient()
+      
+      const data = await transactionClient.listTransactions({ limit: 100, offset: 0 })
+      
+      const enrichedData: EnrichedTransaction[] = await Promise.all(
+        data.map(async (transaction) => {
+          const enriched: EnrichedTransaction = {
+            ...transaction,
+            type_display: transaction.initiator_user_id === currentUserId ? "sent" : "received"
+          }
+
+          try {
+            enriched.requested_item = await itemsClient.getItemById(transaction.requested_item_id)
+          } catch (err) {
+            console.error(`Failed to fetch item:`, err)
+          }
+
+          if (transaction.offered_item_id) {
+            try {
+              enriched.offered_item = await itemsClient.getItemById(transaction.offered_item_id)
+            } catch (err) {
+              console.error(`Failed to fetch item:`, err)
+            }
+          }
+
+          try {
+            enriched.initiator_user = await userClient.getUserById(transaction.initiator_user_id)
+          } catch (err) {
+            console.error(`Failed to fetch user:`, err)
+          }
+
+          try {
+            enriched.receiver_user = await userClient.getUserById(transaction.receiver_user_id)
+          } catch (err) {
+            console.error(`Failed to fetch user:`, err)
+          }
+
+          return enriched
+        })
+      )
+      
+      setTransactions(enrichedData)
+    } catch (err) {
+      console.error("Failed to refresh transactions:", err)
+    }
   }
 
-  const handleDecline = (e: React.MouseEvent, requestId: number) => {
+  // 按钮事件处理：接受交易
+  const handleAcceptTrade = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log(`[v0] Decline clicked for request ID: ${requestId}`)
+    
+    try {
+      const client = new TransactionClient()
+      await client.updateTransaction(transactionId, { status: "accepted" })
+      await refreshTransactions()
+    } catch (err) {
+      console.error("Failed to accept trade:", err)
+      alert("Failed to accept trade. Please try again.")
+    }
   }
 
-  const handleCancelRequest = (e: React.MouseEvent, requestId: number) => {
+  // 按钮事件处理：拒绝交易
+  const handleDecline = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log(`[v0] Cancel Request clicked for request ID: ${requestId}`)
+    
+    try {
+      const client = new TransactionClient()
+      await client.updateTransaction(transactionId, { status: "rejected" })
+      await refreshTransactions()
+    } catch (err) {
+      console.error("Failed to decline trade:", err)
+      alert("Failed to decline trade. Please try again.")
+    }
   }
 
-  const handleMarkAsComplete = (e: React.MouseEvent, transactionId: number) => {
+  // 按钮事件处理：取消请求
+  const handleCancelRequest = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    console.log(`[v0] Mark as Complete clicked for transaction ID: ${transactionId}`)
+    
+    try {
+      const client = new TransactionClient()
+      await client.updateTransaction(transactionId, { status: "canceled" })
+      await refreshTransactions()
+    } catch (err) {
+      console.error("Failed to cancel request:", err)
+      alert("Failed to cancel request. Please try again.")
+    }
+  }
+
+  // 按钮事件处理：标记完成
+  const handleMarkAsComplete = async (e: React.MouseEvent, transactionId: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    try {
+      const client = new TransactionClient()
+      await client.updateTransaction(transactionId, { status: "completed" })
+      await refreshTransactions()
+    } catch (err) {
+      console.error("Failed to mark as complete:", err)
+      alert("Failed to mark transaction as complete. Please try again.")
+    }
+  }
+
+  // 根据 status 过滤交易
+  const pendingTransactions = transactions.filter((t) => t.status === "pending")
+  const activeTransactions = transactions.filter((t) => t.status === "accepted")
+  const completedTransactions = transactions.filter((t) => t.status === "completed")
+
+  // 加载状态
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <p className="text-muted-foreground">Loading transactions...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  // 错误状态
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <main className="container mx-auto px-4 py-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex flex-col items-center justify-center h-64 space-y-4">
+              <p className="text-destructive">{error}</p>
+              <Button asChild>
+                <Link href="/login">Go to Login</Link>
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    )
   }
 
   return (
@@ -124,230 +285,286 @@ export default function TransactionsPage() {
               <TabsTrigger value="active">
                 <ArrowRightLeft className="h-4 w-4 mr-2" />
                 Active
+                <Badge variant="secondary" className="ml-2">
+                  {activeTransactions.length}
+                </Badge>
               </TabsTrigger>
               <TabsTrigger value="completed">
                 <CheckCircle2 className="h-4 w-4 mr-2" />
                 Completed
+                <Badge variant="secondary" className="ml-2">
+                  {completedTransactions.length}
+                </Badge>
               </TabsTrigger>
             </TabsList>
 
             {/* Pending Requests */}
             <TabsContent value="requests" className="mt-6">
               <div className="space-y-4">
-                {pendingTransactions.map((request) => (
-                  <Link key={request.id} href={`/transactions/${request.id}`}>
-                    <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between mb-4">
-                          <Badge variant={request.type === "received" ? "default" : "secondary"}>
-                            {request.type === "received" ? "Request Received" : "Request Sent"}
-                          </Badge>
-                          <span className="text-sm text-muted-foreground">{request.date}</span>
-                        </div>
+                {pendingTransactions.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <p className="text-muted-foreground">No pending requests</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  pendingTransactions.map((request) => (
+                    <Link key={request.transaction_id} href={`/transactions/${request.transaction_id}`}>
+                      <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start justify-between mb-4">
+                            <Badge variant={request.type_display === "received" ? "default" : "secondary"}>
+                              {request.type_display === "received" ? "Request Received" : "Request Sent"}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(request.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
 
-                        <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr]">
-                          {/* Your Item */}
-                          <div className="space-y-3">
-                            <p className="text-sm font-medium text-muted-foreground">
-                              {request.type === "received" ? "Your Item" : "Requested Item"}
-                            </p>
-                            <div className="flex gap-3">
-                              <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                                <Image
-                                  src={request.itemImage || "/placeholder.svg"}
-                                  alt={request.item}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">{request.item}</h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarImage src={request.userAvatar || "/placeholder.svg"} />
-                                    <AvatarFallback>{request.user[0]}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm text-muted-foreground">{request.user}</span>
+                          <div className="grid gap-6 md:grid-cols-[1fr_auto_1fr]">
+                            {/* Left: Your Item / Requested Item */}
+                            <div className="space-y-3">
+                              <p className="text-sm font-medium text-muted-foreground">
+                                {request.type_display === "received" ? "Your Item" : "Requested Item"}
+                              </p>
+                              <div className="flex gap-3">
+                                <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
+                                  <Image
+                                    src={request.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                                    alt={request.requested_item?.title || "Item"}
+                                    fill
+                                    className="object-cover"
+                                  />
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold text-sm">
+                                    {request.requested_item?.title || `Item ID: ${request.requested_item_id.slice(0, 8)}...`}
+                                  </h3>
+                                  <p className="text-xs text-muted-foreground mt-1">
+                                    {request.type_display === "received" 
+                                      ? `From: ${request.initiator_user?.username || request.initiator_user_id.slice(0, 8) + '...'}`
+                                      : `Owner: ${request.receiver_user?.username || request.receiver_user_id.slice(0, 8) + '...'}`
+                                    }
+                                  </p>
                                 </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Exchange Icon */}
-                          <div className="flex items-center justify-center">
-                            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                              <ArrowRightLeft className="h-5 w-5 text-primary" />
+                            {/* Exchange Icon */}
+                            <div className="flex items-center justify-center">
+                              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                <ArrowRightLeft className="h-5 w-5 text-primary" />
+                              </div>
+                            </div>
+
+                            {/* Right: Offered Item / Offered Price */}
+                            <div className="space-y-3">
+                              <p className="text-sm font-medium text-muted-foreground">
+                                {request.type === "trade" && request.offered_item ? "Offered Item" : "Offered Price"}
+                              </p>
+                              {request.type === "trade" && request.offered_item ? (
+                                <div className="flex gap-3">
+                                  <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
+                                    <Image
+                                      src={request.offered_item.image_urls?.[0] || "/placeholder.svg"}
+                                      alt={request.offered_item.title || "Offered Item"}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                  <div>
+                                    <h3 className="font-semibold text-sm">
+                                      {request.offered_item.title || `Item ID: ${request.offered_item_id?.slice(0, 8)}...`}
+                                    </h3>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex items-center h-20">
+                                  <p className="text-2xl font-bold">
+                                    ${request.offered_price?.toFixed(2) || "0.00"}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
 
-                          {/* Offered Item */}
-                          <div className="space-y-3">
-                            <p className="text-sm font-medium text-muted-foreground">
-                              {request.type === "received" ? "Offered Item" : "Your Item"}
-                            </p>
-                            <div className="flex gap-3">
-                              <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                                <Image
-                                  src={request.offeredImage || "/placeholder.svg"}
-                                  alt={request.offeredItem}
-                                  fill
-                                  className="object-cover"
-                                />
-                              </div>
-                              <div>
-                                <h3 className="font-semibold">{request.offeredItem}</h3>
-                              </div>
+                          {request.message && (
+                            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                              <p className="text-sm">{request.message}</p>
                             </div>
-                          </div>
-                        </div>
+                          )}
 
-                        {/* Actions */}
-                        {request.type === "received" ? (
-                          <div className="flex gap-3 mt-6">
-                            <Button className="flex-1" onClick={(e) => handleAcceptTrade(e, request.id)}>
-                              <CheckCircle2 className="h-4 w-4 mr-2" />
-                              Accept Trade
-                            </Button>
-                            <Button
-                              variant="outline"
-                              className="flex-1 bg-transparent"
-                              onClick={(e) => handleDecline(e, request.id)}
-                            >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Decline
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="flex gap-3 mt-6">
-                            <Button
-                              variant="outline"
-                              className="flex-1 bg-transparent"
-                              onClick={(e) => handleCancelRequest(e, request.id)}
-                            >
-                              Cancel Request
-                            </Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                          {/* Actions */}
+                          {request.type_display === "received" ? (
+                            <div className="flex gap-3 mt-6">
+                              <Button 
+                                className="flex-1" 
+                                onClick={(e) => handleAcceptTrade(e, request.transaction_id)}
+                              >
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Accept Trade
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="flex-1 bg-transparent"
+                                onClick={(e) => handleDecline(e, request.transaction_id)}
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Decline
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-3 mt-6">
+                              <Button
+                                variant="outline"
+                                className="flex-1 bg-transparent"
+                                onClick={(e) => handleCancelRequest(e, request.transaction_id)}
+                              >
+                                Cancel Request
+                              </Button>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))
+                )}
               </div>
             </TabsContent>
 
             {/* Active Transactions */}
             <TabsContent value="active" className="mt-6">
               <div className="space-y-4">
-                {activeTransactions.map((transaction) => (
-                  <Link key={transaction.id} href={`/transactions/${transaction.id}`}>
-                    <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
-                            <Image
-                              src={transaction.itemImage || "/placeholder.svg"}
-                              alt={transaction.item}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h3 className="font-semibold text-lg">{transaction.item}</h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarImage src={transaction.userAvatar || "/placeholder.svg"} />
-                                    <AvatarFallback>{transaction.user[0]}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm text-muted-foreground">{transaction.user}</span>
+                {activeTransactions.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <p className="text-muted-foreground">No active transactions</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  activeTransactions.map((transaction) => (
+                    <Link key={transaction.transaction_id} href={`/transactions/${transaction.transaction_id}`}>
+                      <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
+                              <Image
+                                src={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                                alt={transaction.requested_item?.title || "Transaction Item"}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <div>
+                                  <h3 className="font-semibold text-lg">
+                                    {transaction.requested_item?.title || `Item: ${transaction.requested_item_id.slice(0, 12)}...`}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    With: {transaction.type_display === "sent" 
+                                      ? transaction.receiver_user?.username || transaction.receiver_user_id.slice(0, 12) + '...'
+                                      : transaction.initiator_user?.username || transaction.initiator_user_id.slice(0, 12) + '...'
+                                    }
+                                  </p>
                                 </div>
+                                <Badge variant="secondary">{transaction.status}</Badge>
                               </div>
-                              <Badge variant="secondary">{transaction.status}</Badge>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-3">
-                              <span>{transaction.type}</span>
-                              <span>•</span>
-                              <span>{transaction.date}</span>
-                            </div>
-                            <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-                              <p className="text-sm">
-                                <span className="font-medium">Next Step:</span> {transaction.nextStep}
-                              </p>
-                            </div>
-                            <div className="flex gap-3 mt-4">
-                              <Button
-                                size="sm"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                  window.location.href = "/messages"
-                                }}
-                              >
-                                Message User
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="bg-transparent"
-                                onClick={(e) => handleMarkAsComplete(e, transaction.id)}
-                              >
-                                Mark as Complete
-                              </Button>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground mt-3">
+                                <span>{transaction.type === "trade" ? "Trade" : "Purchase"}</span>
+                                <span>•</span>
+                                <span>{new Date(transaction.created_at).toLocaleDateString()}</span>
+                              </div>
+                              <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                                <p className="text-sm">
+                                  <span className="font-medium">Next Step:</span> Arrange meetup
+                                </p>
+                              </div>
+                              <div className="flex gap-3 mt-4">
+                                <Button
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    window.location.href = "/messages"
+                                  }}
+                                >
+                                  Message User
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="bg-transparent"
+                                  onClick={(e) => handleMarkAsComplete(e, transaction.transaction_id)}
+                                >
+                                  Mark as Complete
+                                </Button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))
+                )}
               </div>
             </TabsContent>
 
             {/* Completed Transactions */}
             <TabsContent value="completed" className="mt-6">
               <div className="space-y-4">
-                {completedTransactions.map((transaction) => (
-                  <Link key={transaction.id} href={`/transactions/${transaction.id}`}>
-                    <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                      <CardContent className="p-6">
-                        <div className="flex items-start gap-4">
-                          <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                            <Image
-                              src={transaction.itemImage || "/placeholder.svg"}
-                              alt={transaction.item}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-start justify-between">
-                              <div>
-                                <h3 className="font-semibold">{transaction.item}</h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Avatar className="h-6 w-6">
-                                    <AvatarImage src={transaction.userAvatar || "/placeholder.svg"} />
-                                    <AvatarFallback>{transaction.user[0]}</AvatarFallback>
-                                  </Avatar>
-                                  <span className="text-sm text-muted-foreground">{transaction.user}</span>
+                {completedTransactions.length === 0 ? (
+                  <Card>
+                    <CardContent className="p-12 text-center">
+                      <p className="text-muted-foreground">No completed transactions</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  completedTransactions.map((transaction) => (
+                    <Link key={transaction.transaction_id} href={`/transactions/${transaction.transaction_id}`}>
+                      <Card className="cursor-pointer hover:border-primary/50 transition-colors">
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
+                              <Image
+                                src={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                                alt={transaction.requested_item?.title || "Transaction Item"}
+                                fill
+                                className="object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <div>
+                                  <h3 className="font-semibold">
+                                    {transaction.requested_item?.title || `Item: ${transaction.requested_item_id.slice(0, 12)}...`}
+                                  </h3>
+                                  <p className="text-sm text-muted-foreground mt-1">
+                                    With: {transaction.type_display === "sent"
+                                      ? transaction.receiver_user?.username || transaction.receiver_user_id.slice(0, 12) + '...'
+                                      : transaction.initiator_user?.username || transaction.initiator_user_id.slice(0, 12) + '...'
+                                    }
+                                  </p>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
+                                    <Badge variant="outline">
+                                      {transaction.type === "trade" ? "Trade" : "Purchase"}
+                                    </Badge>
+                                    <span>•</span>
+                                    <span>Completed {new Date(transaction.updated_at).toLocaleDateString()}</span>
+                                  </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                                  <Badge variant="outline">{transaction.type}</Badge>
-                                  <span>•</span>
-                                  <span>Completed {transaction.completedDate}</span>
-                                </div>
+                                <Badge variant="default" className="bg-green-500">
+                                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                                  Completed
+                                </Badge>
                               </div>
-                              <Badge variant="default" className="bg-green-500">
-                                <CheckCircle2 className="h-3 w-3 mr-1" />
-                                Completed
-                              </Badge>
                             </div>
                           </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                ))}
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))
+                )}
               </div>
             </TabsContent>
           </Tabs>

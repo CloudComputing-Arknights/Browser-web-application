@@ -1,10 +1,16 @@
 import { getOpenAPIConfiguration } from "@/lib/APIConfig";
-import { UserApi, SignInRes, SignedInUserRes } from "@/client";
+import { UserApi, SignInRes, SignedInUserRes, PublicUserRes } from "@/client";
 
 export default class UserClient {
   async authMe(): Promise<SignedInUserRes> {
     const api = new UserApi(getOpenAPIConfiguration());
     const res = await api.authMeMeUserGet();
+    return res.data;
+  }
+
+  async getUserById(userId: string): Promise<PublicUserRes> {
+    const api = new UserApi(getOpenAPIConfiguration());
+    const res = await api.getUserByIdUsersUserIdGet(userId);
     return res.data;
   }
 

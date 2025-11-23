@@ -4,7 +4,9 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/AddressApi.md
 docs/AddressDTO.md
+docs/AddressUserApi.md
 docs/CategoryRead.md
 docs/ConditionType.md
 docs/CreateOwnItemReq.md
@@ -16,14 +18,16 @@ docs/ItemUserApi.md
 docs/ItemsApi.md
 docs/JobRead.md
 docs/JobStatus.md
+docs/PublicUserRes.md
 docs/SignInReq.md
 docs/SignInRes.md
 docs/SignUpReq.md
 docs/SignedInUserRes.md
-docs/TransactionApi.md
 docs/TransactionRes.md
 docs/TransactionType.md
+docs/TransactionUserItemApi.md
 docs/UpdateOwnItemReq.md
+docs/UpdateProfileReq.md
 docs/UpdateTransactionStatusReq.md
 docs/UserApi.md
 docs/ValidationError.md
