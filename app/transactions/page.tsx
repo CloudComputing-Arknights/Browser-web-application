@@ -16,13 +16,13 @@ import UserClient from "@/lib/clients/UserClient"
 import type { TransactionRes, ItemRead, PublicUserRes } from "@/client"
 import { fetchCurrentUser, isUserLoggedIn } from "@/lib/auth"
 
-// 扩展的 Transaction 类型，包含前端需要的额外字段
+// Extended Transaction type with additional frontend fields
 type EnrichedTransaction = TransactionRes & {
-  type_display: "received" | "sent"  // 用于判断是收到的还是发出的请求
-  requested_item?: ItemRead  // 请求的物品详细信息
-  offered_item?: ItemRead    // 提供的物品详细信息
-  initiator_user?: PublicUserRes  // 发起人用户信息
-  receiver_user?: PublicUserRes   // 接收人用户信息
+  type_display: "received" | "sent"  // Whether the request was received or sent
+  requested_item?: ItemRead  // Detailed information about the requested item
+  offered_item?: ItemRead    // Detailed information about the offered item
+  initiator_user?: PublicUserRes  // Information about the initiator user
+  receiver_user?: PublicUserRes   // Information about the receiver user
 }
 
 export default function TransactionsPage() {
@@ -31,31 +31,31 @@ export default function TransactionsPage() {
   const [error, setError] = useState<string | null>(null)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
-  // 获取当前用户 ID 和交易列表
+  // Fetch current user ID and transaction list
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
         
-        // 检查登录状态
+        // Check login status
         if (!isUserLoggedIn()) {
           setError("Please log in to view transactions")
           setLoading(false)
           return
         }
 
-        // 获取当前用户信息
+        // Fetch current user information
         const user = await fetchCurrentUser()
         setCurrentUserId(user.id)
 
-        // 获取所有交易（后端已自动过滤当前用户相关的交易）
+        // Fetch all transactions (backend automatically filters transactions related to current user)
         const transactionClient = new TransactionClient()
         const data = await transactionClient.listTransactions({
           limit: 100,
           offset: 0,
         })
 
-        // 获取所有相关的 Item 和 User 详细信息
+        // Fetch detailed information for all related Items and Users
         const itemsClient = new ItemsClient()
         const userClient = new UserClient()
         const enrichedData: EnrichedTransaction[] = await Promise.all(
@@ -65,14 +65,14 @@ export default function TransactionsPage() {
               type_display: transaction.initiator_user_id === user.id ? "sent" : "received"
             }
 
-            // 获取 requested_item 的详细信息
+            // Fetch requested_item details
             try {
               enriched.requested_item = await itemsClient.getItemById(transaction.requested_item_id)
             } catch (err) {
               console.error(`Failed to fetch item ${transaction.requested_item_id}:`, err)
             }
 
-            // 获取 offered_item 的详细信息（如果存在）
+            // Fetch offered_item details (if exists)
             if (transaction.offered_item_id) {
               try {
                 enriched.offered_item = await itemsClient.getItemById(transaction.offered_item_id)
@@ -81,14 +81,14 @@ export default function TransactionsPage() {
               }
             }
 
-            // 获取 initiator_user 的详细信息
+            // Fetch initiator_user details
             try {
               enriched.initiator_user = await userClient.getUserById(transaction.initiator_user_id)
             } catch (err) {
               console.error(`Failed to fetch user ${transaction.initiator_user_id}:`, err)
             }
 
-            // 获取 receiver_user 的详细信息
+            // Fetch receiver_user details
             try {
               enriched.receiver_user = await userClient.getUserById(transaction.receiver_user_id)
             } catch (err) {
@@ -111,7 +111,7 @@ export default function TransactionsPage() {
     fetchData()
   }, [])
 
-  // 刷新交易列表的辅助函数
+  // Helper function to refresh transaction list
   const refreshTransactions = async () => {
     try {
       const transactionClient = new TransactionClient()
@@ -163,7 +163,7 @@ export default function TransactionsPage() {
     }
   }
 
-  // 按钮事件处理：接受交易
+  // Button event handler: Accept trade
   const handleAcceptTrade = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -178,7 +178,7 @@ export default function TransactionsPage() {
     }
   }
 
-  // 按钮事件处理：拒绝交易
+  // Button event handler: Decline trade
   const handleDecline = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -193,7 +193,7 @@ export default function TransactionsPage() {
     }
   }
 
-  // 按钮事件处理：取消请求
+  // Button event handler: Cancel request
   const handleCancelRequest = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -208,7 +208,7 @@ export default function TransactionsPage() {
     }
   }
 
-  // 按钮事件处理：标记完成
+  // Button event handler: Mark as complete
   const handleMarkAsComplete = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
@@ -223,12 +223,12 @@ export default function TransactionsPage() {
     }
   }
 
-  // 根据 status 过滤交易
+  // Filter transactions by status
   const pendingTransactions = transactions.filter((t) => t.status === "pending")
   const activeTransactions = transactions.filter((t) => t.status === "accepted")
   const completedTransactions = transactions.filter((t) => t.status === "completed")
 
-  // 加载状态
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -244,7 +244,7 @@ export default function TransactionsPage() {
     )
   }
 
-  // 错误状态
+  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-background">
