@@ -103,8 +103,6 @@ export default function BrowseItemsPage() {
             image: item.image_urls && item.image_urls.length > 0
                 ? item.image_urls[0]
                 : "/placeholder-image.jpg",
-            // location: "Location Hidden",
-            // postedBy: "User",
             location: item.address?.city+" "+item.address?.street,
             postedBy: item.user?.username || "Unknown User",
             price: item.price,
