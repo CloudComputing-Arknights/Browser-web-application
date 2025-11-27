@@ -37,7 +37,7 @@ export default function BrowseItemsPage() {
             const itemsApi = new ItemsApi(config);
             const response = await itemsApi.listCategoriesItemsCategoriesGet(
                 0,  // skip
-                100 // limit (假设获取前100个分类)
+                100 // limit
             );
             setCategories(response.data);
         } catch (err) {
@@ -103,8 +103,8 @@ export default function BrowseItemsPage() {
             image: item.image_urls && item.image_urls.length > 0
                 ? item.image_urls[0]
                 : "/placeholder-image.jpg",
-            location: "Location Hidden",
-            postedBy: "User",
+            location: item.address?.city+" "+item.address?.street,
+            postedBy: item.user?.username || "Unknown User",
             price: item.price,
             transactionType: item.transaction_type
         };
