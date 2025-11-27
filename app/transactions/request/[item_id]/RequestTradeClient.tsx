@@ -1,9 +1,7 @@
 "use client"
 
-import type { GetStaticPaths, GetStaticProps } from "next"
 import type React from "react"
 
-import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -12,91 +10,251 @@ import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowRightLeft, DollarSign, Package } from "lucide-react"
+import { ArrowRightLeft, DollarSign, Package, Loader2, AlertCircle } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { mockItems } from "@/lib/mock-data"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
-
-type Item = (typeof mockItems)[0]
+import ItemsClient from "@/lib/clients/ItemsClient"
+import ItemUserClient from "@/lib/clients/ItemUserClient"
+import TransactionClient from "@/lib/clients/TransactionClient"
+import UserClient from "@/lib/clients/UserClient"
+import { ItemRead, CreateTransactionReq } from "@/client"
 
 interface RequestTradeClientProps {
-  item: Item // receive data from server component
+  itemId: string
 }
 
-export default function RequestTradeClient({ item }: RequestTradeClientProps) {  const router = useRouter()
+export default function RequestTradeClient({ itemId }: RequestTradeClientProps) {
+  const router = useRouter()
+  
+  // State for form inputs
   const [offerType, setOfferType] = useState<"trade" | "purchase">("trade")
   const [selectedItem, setSelectedItem] = useState("")
   const [offerPrice, setOfferPrice] = useState("")
   const [message, setMessage] = useState("")
 
-  // Mock target item data
-  const targetItem = {
-    id: item.id,
-    title: item.title,
-    image: item.images[0] || "/placeholder.svg",
-    seller: {
-      name: "Sarah Johnson",
-      avatar: "/diverse-user-avatars.png",
-    },
-  }
+  // State for data from backend
+  const [item, setItem] = useState<any | null>(null) // Use 'any' to access extended fields like 'user' and 'address'
+  const [myItems, setMyItems] = useState<ItemRead[]>([])
+  const [currentUser, setCurrentUser] = useState<{ id: string } | null>(null)
 
-  // Mock user's items for trade
-  const myItems = [
-    { id: "1", title: "Programming Books Collection", image: "/programming-books-stack.jpg" },
-    { id: "2", title: "Modern Office Chair", image: "/modern-office-chair.png" },
-    { id: "3", title: "Desk Lamp", image: "/modern-desk-lamp.png" },
-  ]
+  // State for UI
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Fetch item details, user's items, and current user on mount
+  useEffect(() => {
+    // Guard: Don't fetch if itemId is not available
+    if (!itemId || itemId === 'undefined') {
+      setError("Invalid item ID")
+      setLoading(false)
+      return
+    }
+
+    const fetchData = async () => {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const itemsClient = new ItemsClient()
+        const itemUserClient = new ItemUserClient()
+        const userClient = new UserClient()
+
+        // Fetch item details
+        console.log('[RequestTradeClient] Fetching item with ID:', itemId)
+        const itemData = await itemsClient.getItemById(itemId)
+        console.log('[RequestTradeClient] Item data received:', itemData)
+        setItem(itemData)
+
+        // Fetch current user info
+        const userData = await userClient.authMe()
+        setCurrentUser({ id: userData.id })
+
+        // Fetch user's own items for trade option
+        const myItemsData = await itemUserClient.listMyItems()
+        // Filter out the current item from the list
+        const filteredItems = Array.isArray(myItemsData) 
+          ? myItemsData.filter((i: ItemRead) => i.item_UUID !== itemId)
+          : []
+        setMyItems(filteredItems)
+
+        // Note: Backend returns seller info in item.user field
+        // No need to fetch separately
+
+      } catch (err) {
+        console.error("Failed to fetch data:", err)
+        setError("Failed to load item details. Please try again.")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [itemId])
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Trade request submitted:", { offerType, selectedItem, offerPrice, message })
-    router.push("/transactions")
+    
+    if (!item || !currentUser) {
+      setError("Missing required data. Please refresh the page.")
+      return
+    }
+
+    // Validation
+    if (offerType === "trade" && !selectedItem) {
+      setError("Please select an item to trade.")
+      return
+    }
+
+    if (offerType === "purchase" && (!offerPrice || parseFloat(offerPrice) <= 0)) {
+      setError("Please enter a valid offer price.")
+      return
+    }
+
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      const transactionClient = new TransactionClient()
+
+      // Get receiver_user_id from item.user.id
+      const receiverUserId = item.user?.id
+      
+      if (!receiverUserId) {
+        throw new Error("Could not determine item owner. Please contact support.")
+      }
+
+      console.log('[RequestTradeClient] Creating transaction:', {
+        requested_item_id: item.item_UUID,
+        receiver_user_id: receiverUserId,
+        type: offerType,
+        offered_item_id: offerType === "trade" ? selectedItem : undefined,
+        offered_price: offerType === "purchase" ? parseFloat(offerPrice) : undefined,
+      })
+
+      // Build transaction request
+      const payload: CreateTransactionReq = {
+        requested_item_id: item.item_UUID,
+        receiver_user_id: receiverUserId,
+        type: offerType as "trade" | "purchase",
+        message: message || null,
+      }
+
+      // Add offer details based on type
+      if (offerType === "trade") {
+        payload.offered_item_id = selectedItem
+      } else {
+        payload.offered_price = parseFloat(offerPrice)
+      }
+
+      // Create transaction
+      await transactionClient.createTransaction(payload)
+
+      // Success - redirect to transactions page
+      router.push("/transactions")
+    } catch (err: any) {
+      console.error("Failed to create transaction:", err)
+      setError(err.message || "Failed to submit trade request. Please try again.")
+      setSubmitting(false)
+    }
   }
 
-  return (
-    
+  // Loading state
+  if (loading) {
+    return (
+      <main className="container mx-auto px-4 py-20 flex justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading item details...</p>
+        </div>
+      </main>
+    )
+  }
+
+  // Error state or item not found
+  if (error || !item) {
+    return (
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <Link href={`/item/${item.id}`} className="text-sm text-muted-foreground hover:underline">
-              ← Back to item
-            </Link>
-            <h1 className="text-3xl font-bold mt-2">Request Trade</h1>
-            <p className="text-muted-foreground mt-1">Make an offer to acquire this item</p>
-          </div>
+          <Card className="border-destructive">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 text-destructive">
+                <AlertCircle className="h-5 w-5" />
+                <p>{error || "Item not found"}</p>
+              </div>
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={() => router.back()}
+              >
+                Go Back
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+    )
+  }
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Target Item */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Item You Want</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
-                    <Image
-                      src={targetItem.image || "/placeholder.svg"}
-                      alt={targetItem.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg">{targetItem.title}</h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={targetItem.seller.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>{targetItem.seller.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm text-muted-foreground">Listed by {targetItem.seller.name}</span>
-                    </div>
-                  </div>
+  const targetItem = {
+    id: item.item_UUID,
+    title: item.title,
+    image: item.image_urls?.[0] || "/placeholder.svg",
+    price: item.price,
+    transactionType: item.transaction_type,
+  }
+
+  // Seller info from item.user
+  const seller = item.user
+
+  return (
+    <main className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-6">
+          <Link href={`/item/${itemId}`} className="text-sm text-muted-foreground hover:underline">
+            ← Back to item
+          </Link>
+          <h1 className="text-3xl font-bold mt-2">Request Trade</h1>
+          <p className="text-muted-foreground mt-1">Make an offer to acquire this item</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Target Item */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Item You Want</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center gap-4">
+                <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
+                  <Image
+                    src={targetItem.image}
+                    alt={targetItem.title}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
-              </CardContent>
-            </Card>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg">{targetItem.title}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ${targetItem.price} • {targetItem.transactionType}
+                  </p>
+                  {seller && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={seller.avatar_url || "/placeholder-user.jpg"} />
+                        <AvatarFallback>{seller.username[0].toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm text-muted-foreground">Listed by {seller.username}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
             {/* Offer Type Selection */}
             <Card>
@@ -125,36 +283,55 @@ export default function RequestTradeClient({ item }: RequestTradeClientProps) { 
                 {offerType === "trade" && (
                   <div className="space-y-3 pt-4 border-t">
                     <Label htmlFor="item-select">Select an item to trade</Label>
-                    <Select value={selectedItem} onValueChange={setSelectedItem}>
-                      <SelectTrigger id="item-select">
-                        <SelectValue placeholder="Choose from your items" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {myItems.map((item) => (
-                          <SelectItem key={item.id} value={item.id}>
-                            <div className="flex items-center gap-2">
-                              <Package className="h-4 w-4" />
-                              {item.title}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {selectedItem && (
-                      <div className="mt-4 p-4 border rounded-lg">
-                        <p className="text-sm font-medium mb-2">Your offer:</p>
-                        <div className="flex items-center gap-3">
-                          <div className="relative h-16 w-16 rounded-lg overflow-hidden border flex-shrink-0">
-                            <Image
-                              src={myItems.find((item) => item.id === selectedItem)?.image || "/placeholder.svg"}
-                              alt={myItems.find((item) => item.id === selectedItem)?.title || ""}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                          <p className="font-semibold">{myItems.find((item) => item.id === selectedItem)?.title}</p>
-                        </div>
+                    {myItems.length === 0 ? (
+                      <div className="p-4 border border-dashed rounded-lg text-center text-muted-foreground">
+                        <Package className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">You don't have any items to trade.</p>
+                        <Link href="/add-item">
+                          <Button variant="link" className="mt-2">
+                            List an item first
+                          </Button>
+                        </Link>
                       </div>
+                    ) : (
+                      <>
+                        <Select value={selectedItem} onValueChange={setSelectedItem}>
+                          <SelectTrigger id="item-select">
+                            <SelectValue placeholder="Choose from your items" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {myItems.map((userItem) => (
+                              <SelectItem key={userItem.item_UUID} value={userItem.item_UUID}>
+                                <div className="flex items-center gap-2">
+                                  <Package className="h-4 w-4" />
+                                  {userItem.title}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {selectedItem && (
+                          <div className="mt-4 p-4 border rounded-lg">
+                            <p className="text-sm font-medium mb-2">Your offer:</p>
+                            <div className="flex items-center gap-3">
+                              <div className="relative h-16 w-16 rounded-lg overflow-hidden border flex-shrink-0">
+                                <Image
+                                  src={myItems.find((userItem) => userItem.item_UUID === selectedItem)?.image_urls?.[0] || "/placeholder.svg"}
+                                  alt={myItems.find((userItem) => userItem.item_UUID === selectedItem)?.title || ""}
+                                  fill
+                                  className="object-cover"
+                                />
+                              </div>
+                              <div>
+                                <p className="font-semibold">{myItems.find((userItem) => userItem.item_UUID === selectedItem)?.title}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  ${myItems.find((userItem) => userItem.item_UUID === selectedItem)?.price}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
                     )}
                   </div>
                 )}
@@ -188,15 +365,40 @@ export default function RequestTradeClient({ item }: RequestTradeClientProps) { 
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     rows={4}
+                    disabled={submitting}
                   />
                 </div>
               </CardContent>
             </Card>
 
+            {/* Error Display */}
+            {error && (
+              <Card className="border-destructive">
+                <CardContent className="pt-6">
+                  <div className="flex items-center gap-3 text-destructive">
+                    <AlertCircle className="h-5 w-5" />
+                    <p className="text-sm">{error}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Submit */}
             <div className="flex gap-3">
-              <Button type="submit" size="lg" className="flex-1">
-                Send Trade Request
+              <Button 
+                type="submit" 
+                size="lg" 
+                className="flex-1"
+                disabled={submitting || (offerType === "trade" && myItems.length === 0)}
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Trade Request"
+                )}
               </Button>
               <Button
                 type="button"
@@ -204,6 +406,7 @@ export default function RequestTradeClient({ item }: RequestTradeClientProps) { 
                 size="lg"
                 onClick={() => router.back()}
                 className="bg-transparent"
+                disabled={submitting}
               >
                 Cancel
               </Button>
@@ -211,6 +414,5 @@ export default function RequestTradeClient({ item }: RequestTradeClientProps) { 
           </form>
         </div>
       </main>
-    
   )
 }

@@ -237,7 +237,7 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                                         Message Seller
                                     </Button>
                                     <Button variant="outline" className="w-full bg-transparent" asChild>
-                                        <Link href={`/transactions/request/${item.id}`}>
+                                        <Link href={`/transactions/request/${item.item_UUID}`}>
                                             <Package className="h-4 w-4 mr-2" />
                                             Request Trade
                                         </Link>
