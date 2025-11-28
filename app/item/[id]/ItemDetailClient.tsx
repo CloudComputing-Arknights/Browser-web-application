@@ -170,49 +170,49 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                     <div className="flex items-center gap-1">
                                         <MapPin className="h-4 w-4" />
-                                        {item.address?.city+" "+item.address?.street || "Location Hidden"}
+                                        Location Hidden {/* TODO: get location */}
                                     </div>
                                     <div className="flex items-center gap-1">
                                         <Calendar className="h-4 w-4" />
-                                        Updated at: {item.updated_at ? new Date(item.updated_at).toLocaleString() : "Hidden"}
+                                        Posted recently
                                     </div>
                                 </div>
                             </CardContent>
                         </Card>
 
                         {/* TODO: Comment: NOW is MOCK */}
-                        {/*<Card>*/}
-                        {/*    <CardContent className="p-6 space-y-4">*/}
-                        {/*        <h2 className="text-lg font-semibold">Comments</h2>*/}
-                        {/*        <Separator />*/}
-                        {/*        <div className="space-y-3">*/}
-                        {/*          <textarea*/}
-                        {/*              value={newComment}*/}
-                        {/*              onChange={(e) => setNewComment(e.target.value)}*/}
-                        {/*              placeholder="Post a comment..."*/}
-                        {/*              className="w-full px-3 py-2 border rounded-md bg-background"*/}
-                        {/*              rows={3}*/}
-                        {/*          />*/}
-                        {/*            <Button onClick={handlePostComment} className="w-full">Post Comment</Button>*/}
-                        {/*        </div>*/}
-                        {/*        <div className="space-y-4 mt-4">*/}
-                        {/*            {comments.map((comment) => (*/}
-                        {/*                <div key={comment.id} className="flex gap-3">*/}
-                        {/*                    <Avatar className="h-8 w-8">*/}
-                        {/*                        <AvatarFallback>{comment.author[0]}</AvatarFallback>*/}
-                        {/*                    </Avatar>*/}
-                        {/*                    <div>*/}
-                        {/*                        <div className="flex items-center gap-2">*/}
-                        {/*                            <span className="font-semibold text-sm">{comment.author}</span>*/}
-                        {/*                            <span className="text-xs text-muted-foreground">{comment.date}</span>*/}
-                        {/*                        </div>*/}
-                        {/*                        <p className="text-sm text-muted-foreground">{comment.text}</p>*/}
-                        {/*                    </div>*/}
-                        {/*                </div>*/}
-                        {/*            ))}*/}
-                        {/*        </div>*/}
-                        {/*    </CardContent>*/}
-                        {/*</Card>*/}
+                        <Card>
+                            <CardContent className="p-6 space-y-4">
+                                <h2 className="text-lg font-semibold">Comments</h2>
+                                <Separator />
+                                <div className="space-y-3">
+                  <textarea
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Post a comment..."
+                      className="w-full px-3 py-2 border rounded-md bg-background"
+                      rows={3}
+                  />
+                                    <Button onClick={handlePostComment} className="w-full">Post Comment</Button>
+                                </div>
+                                <div className="space-y-4 mt-4">
+                                    {comments.map((comment) => (
+                                        <div key={comment.id} className="flex gap-3">
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-semibold text-sm">{comment.author}</span>
+                                                    <span className="text-xs text-muted-foreground">{comment.date}</span>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground">{comment.text}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* Right side */}
@@ -228,7 +228,7 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                                         <div className="flex-1">
                                             <div className="font-semibold">User</div>
                                             <div className="text-sm text-muted-foreground">
-                                                {item.user?.username}
+                                                Verified User
                                             </div>
                                         </div>
                                     </div>

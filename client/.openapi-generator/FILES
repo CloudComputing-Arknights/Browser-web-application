@@ -5,7 +5,6 @@ base.ts
 common.ts
 configuration.ts
 docs/AddressApi.md
-docs/AddressBase.md
 docs/AddressDTO.md
 docs/AddressUserApi.md
 docs/CategoryRead.md

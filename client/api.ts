@@ -23,20 +23,13 @@ import type { RequestArgs } from './base';
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
-export interface AddressBase {
-    'street': string;
-    'city': string;
-    'country': string;
-    'state'?: string | null;
-    'postal_code'?: string | null;
-}
 export interface AddressDTO {
+    'id'?: string | null;
     'street': string;
     'city': string;
     'country': string;
     'state'?: string | null;
     'postal_code'?: string | null;
-    'id'?: string | null;
     'created_at'?: string | null;
     'updated_at'?: string | null;
 }
@@ -122,8 +115,6 @@ export interface ItemRead {
     'image_urls'?: Array<string> | null;
     'item_UUID': string;
     'categories'?: Array<CategoryRead> | null;
-    'address'?: AddressBase | null;
-    'user'?: PublicUserRes;
     'created_at'?: string | null;
     'updated_at'?: string | null;
 }
@@ -1142,7 +1133,7 @@ export const ItemsApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
-         * @summary Get all items through pagination.
+         * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
          * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
@@ -1238,7 +1229,7 @@ export const ItemsApiFp = function(configuration?: Configuration) {
         },
         /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
-         * @summary Get all items through pagination.
+         * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
          * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
@@ -1286,7 +1277,7 @@ export const ItemsApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * Get items through pagination, can be filtered by ID, category, condition, transaction type
-         * @summary Get all items through pagination.
+         * @summary Get items through pagination.
          * @param {Array<string> | null} [id] Filter by a list of item IDs
          * @param {number | null} [categoryId] Filter by item\&#39;s category
          * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
@@ -1331,7 +1322,7 @@ export class ItemsApi extends BaseAPI {
 
     /**
      * Get items through pagination, can be filtered by ID, category, condition, transaction type
-     * @summary Get all items through pagination.
+     * @summary Get items through pagination.
      * @param {Array<string> | null} [id] Filter by a list of item IDs
      * @param {number | null} [categoryId] Filter by item\&#39;s category
      * @param {TransactionType | null} [transactionType] Filter by item\&#39;s transaction type
