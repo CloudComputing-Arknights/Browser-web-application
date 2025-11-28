@@ -6,7 +6,7 @@ All URIs are relative to *http://localhost*
 |------------- | ------------- | -------------|
 |[**getPublicItemByIdItemsItemIdGet**](#getpublicitembyiditemsitemidget) | **GET** /items/{item_id} | Get an item by its id|
 |[**listCategoriesItemsCategoriesGet**](#listcategoriesitemscategoriesget) | **GET** /items/categories | List Categories|
-|[**listPublicItemsItemsGet**](#listpublicitemsitemsget) | **GET** /items/ | Get all items through pagination.|
+|[**listPublicItemsItemsGet**](#listpublicitemsitemsget) | **GET** /items/ | Get items through pagination.|
 
 # **getPublicItemByIdItemsItemIdGet**
 > ItemRead getPublicItemByIdItemsItemIdGet()
