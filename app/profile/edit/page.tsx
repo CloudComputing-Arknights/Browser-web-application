@@ -4,7 +4,6 @@ import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2 } from "lucide-react"
@@ -12,12 +11,17 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 
-// Interface for form state
+// ✅ Import existing client wrapper
+import UserClient from "@/lib/clients/UserClient"
+// ✅ Import generated types for type safety (SignedInUserRes matches the authMe response)
+import { SignedInUserRes } from "@/client"
+
+// Local interface for the form state to manage UI fields
 interface UserFormData {
   username: string
   email: string
   phone: string
-  location: string // Derived from address, read-only
+  location: string // Derived field, read-only
   avatar_url: string
   birth_date: string
 }
@@ -36,47 +40,46 @@ export default function EditProfilePage() {
     birth_date: "",
   })
 
-  // 1. Fetch current user data on component mount
+  // --- 1. Fetch current user data (Optimized with UserClient) ---
   useEffect(() => {
     const fetchUser = async () => {
+      // Note: UserClient handles token retrieval internally via APIConfig
+      // We check token existence here just for quick redirection if logged out
       const token = localStorage.getItem("access_token")
-      
-      // Redirect to login if no token found
       if (!token) {
         router.push("/login")
         return
       }
 
       try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
-        const res = await fetch(`${API_BASE}/me/user`, {
-          headers: { "Authorization": `Bearer ${token}` }
+        // ✅ Optimization: Use existing UserClient.authMe() 
+        // This replaces the manual fetch(GET /me/user) and header setup
+        const userClient = new UserClient()
+        const data: SignedInUserRes = await userClient.authMe()
+
+        // Logic: Derive "Location" string from the first address in the list
+        // Note: Using 'any' cast on addresses if generated types are strict about array types
+        let derivedLocation = "No location set"
+        if (data.addresses && data.addresses.length > 0) {
+          const addr = (data.addresses as any)[0] 
+          const parts = [addr.city, addr.state].filter(Boolean) 
+          derivedLocation = parts.join(", ")
+        }
+
+        // Populate form state from the client response
+        setFormData({
+          username: data.username || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          location: derivedLocation,
+          avatar_url: data.avatar_url || "",
+          // Format date to YYYY-MM-DD for HTML input
+          birth_date: data.birth_date ? String(data.birth_date).split("T")[0] : "",
         })
 
-        if (res.ok) {
-          const data = await res.json()
-          
-          // Logic: Derive "Location" string from the first address in the list
-          let derivedLocation = "No location set"
-          if (data.addresses && data.addresses.length > 0) {
-            const addr = data.addresses[0]
-            // Combine City and State (e.g., "Austin, TX")
-            const parts = [addr.city, addr.state].filter(Boolean) 
-            derivedLocation = parts.join(", ")
-          }
-
-          // Populate form state
-          setFormData({
-            username: data.username || "",
-            email: data.email || "",
-            phone: data.phone || "",
-            location: derivedLocation, // Set the derived location
-            avatar_url: data.avatar_url || "",
-            birth_date: data.birth_date ? String(data.birth_date).split("T")[0] : "",
-          })
-        }
       } catch (error) {
         console.error("Failed to load profile", error)
+        // Optionally handle 401 Unauthorized specifically if needed
       } finally {
         setIsLoading(false)
       }
@@ -85,7 +88,9 @@ export default function EditProfilePage() {
     fetchUser()
   }, [router])
 
-  // 2. Handle Save Changes
+  // --- 2. Handle Save Changes (Keep as fetch) ---
+  // Constraint: We cannot use UserClient here because it lacks an 'updateMe' method.
+  // We must stick to manual fetch until UserClient.ts is updated in the future.
   const handleSave = async () => {
     setIsSaving(true)
     const token = localStorage.getItem("access_token")
@@ -99,7 +104,7 @@ export default function EditProfilePage() {
           "Authorization": `Bearer ${token}`
         },
         body: JSON.stringify({
-          // Send editable fields only. Location is NOT sent because it comes from the Address table.
+          // Send editable fields only. Location is ignored as it is derived.
           email: formData.email,
           phone: formData.phone || null,       
           avatar_url: formData.avatar_url || null, 
@@ -210,8 +215,6 @@ export default function EditProfilePage() {
                   />
                 </div>
               </div>
-
-
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
