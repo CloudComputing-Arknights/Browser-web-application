@@ -26,3 +26,32 @@ export default function RootLayout({
     </html>
   )
 }
+
+"use client"
+
+import { GoogleOAuthProvider } from "@react-oauth/google"
+import React from "react"
+
+const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!
+
+export function GoogleProvider({ children }: { children: React.ReactNode }) {
+  return <GoogleOAuthProvider clientId={clientId}>{children}</GoogleOAuthProvider>
+}
+
+import type { Metadata } from "next"
+import { GoogleProvider } from "./GoogleProvider"
+
+export const metadata: Metadata = {
+  title: "SwapHub",
+  description: "Neighborhood exchange",
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <GoogleProvider>{children}</GoogleProvider>
+      </body>
+    </html>
+  )
+}
