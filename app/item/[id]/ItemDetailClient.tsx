@@ -1,318 +1,254 @@
 "use client"
 
-// Import all UI components and Hooks
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
-import { MapPin, Calendar, Heart, MessageCircle, Star, Package } from "lucide-react"
+import { MapPin, Calendar, Heart, MessageCircle, Star, Package, Loader2, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
-import { mockItems } from "@/lib/mock-data" // Import mock data to get types
+import { useState, useEffect } from "react"
 
-// Define Item type based on mock data structure
-type Item = (typeof mockItems)[0]
+import { getOpenAPIConfiguration } from "@/lib/APIConfig"
+import { ItemsApi, ItemRead } from "@/client"
 
-// Props interface to receive data from server component
 interface ItemDetailClientProps {
-  item: Item
+    itemId: string
 }
 
-// Client component for displaying item details
-// Receives item data as props from the server component (page.tsx)
-export default function ItemDetailClient({ item }: ItemDetailClientProps) {
-  const router = useRouter()
-  
-  // Item data is now received from props instead of being hardcoded
+export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
+    const router = useRouter()
 
-  // State management for trade requests and comments
-  // Trade request status: pending, accepted, declined, cancelled, completed
-  const [tradeStatus, setTradeStatus] = useState<string | null>(null)
-  
-  // Comments list - in production, this would be fetched from an API
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "John Smith",
-      avatar: "/diverse-user-avatars.png",
-      text: "Great item! Is it still available?",
-      date: "1 day ago",
-    },
-    // Additional hardcoded comments would go here
-  ])
-  
-  // New comment input state
-  const [newComment, setNewComment] = useState("")
+    const [item, setItem] = useState<ItemRead | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
 
-  // Mock trade request data - in production, this would come from props or API
-  const tradeRequest = {
-    id: 101,
-    status: "pending", // Possible values: pending, accepted, declined, completed
-    offeredItem: "Laptop Stand",
-    offeredPrice: null,
-  }
+    // Mock Comment Data, may not need this
+    const [comments, setComments] = useState([
+        { id: 1, author: "System", avatar: "", text: "Test comment mock data!", date: "Now" },
+    ])
+    const [newComment, setNewComment] = useState("")
 
-  // Navigate to messages page with seller information
-  const handleMessageSeller = () => {
-    console.log("[v0] Message Seller clicked for seller:", item.seller.name)
-    router.push(`/messages?seller=${item.seller.name}`)
-  }
+    useEffect(() => {
+        const fetchItemDetails = async () => {
+            setLoading(true)
+            try {
+                const config = getOpenAPIConfiguration();
+                const itemsApi = new ItemsApi(config);
 
-  // Accept a pending trade request
-  const handleAcceptTrade = () => {
-    console.log("[v0] Accept Trade clicked for trade request:", tradeRequest.id)
-    setTradeStatus("accepted")
-    // In production, this would call an API to update the trade status
-  }
+                // get a single item from back-end
+                const response = await itemsApi.getPublicItemByIdItemsItemIdGet(itemId);
+                setItem(response.data);
+            } catch (err) {
+                console.error("Failed to fetch item details:", err);
+                setError("Item not found or an error occurred.");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  // Decline a pending trade request
-  const handleDeclineTrade = () => {
-    setTradeStatus("declined")
-    // In production, this would call an API to update the trade status
-  }
+        if (itemId) {
+            fetchItemDetails();
+        }
+    }, [itemId]);
 
-  // Cancel an active trade request
-  const handleCancelRequest = () => {
-    setTradeStatus("cancelled")
-    // In production, this would call an API to cancel the trade
-  }
-
-  // Mark a trade as completed after successful exchange
-  const handleMarkComplete = () => {
-    setTradeStatus("completed")
-    // In production, this would call an API to mark the trade as complete
-  }
-
-  // Post a new comment on the item
-  const handlePostComment = () => {
-    if (newComment.trim()) {
-      console.log(`SIMULATE: Posting new comment on Item ID: ${item.id}`)
-      const comment = {
-        id: comments.length + 1,
-        author: "Current User",
-        avatar: "/diverse-user-avatars.png",
-        text: newComment,
-        date: "just now",
-      }
-      setComments([comment, ...comments])
-      setNewComment("")
+    // =============================== Handle Event ===============================
+    const handleMessageSeller = () => {
+        // router.push(`/messages?seller=${item?.owner_id}`)
+        console.log("Message seller clicked")
     }
-  }
-  return (
-    <div>
-      <main className="container mx-auto px-4 py-8">
-        {/* Main layout: 2/3 for content, 1/3 for sidebar */}
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Main Content Section - takes 2/3 of the width on large screens */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Item Image Gallery */}
-            <Card className="overflow-hidden">
-              <div className="aspect-video relative bg-muted">
-                <Image src={item.images[0] || "/placeholder.svg"} alt={item.title} fill className="object-cover" />
-              </div>
-            </Card>
 
-            {/* Item Details Card */}
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                {/* Item Title and Badges */}
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-balance">{item.title}</h1>
-                    {/* Display exchange type, category, and condition as badges */}
-                    <div className="flex items-center gap-2 mt-2">
-                      <Badge variant="secondary">{item.exchangeType}</Badge>
-                      <Badge variant="outline">{item.category}</Badge>
-                      <Badge variant="outline">{item.condition}</Badge>
+    const handlePostComment = () => {
+        if (newComment.trim()) {
+            setComments([...comments, {
+                id: comments.length + 1,
+                author: "Me",
+                avatar: "",
+                text: newComment,
+                date: "Just now"
+            }])
+            setNewComment("")
+        }
+    }
+
+    if (loading) {
+        return (
+            <main className="container mx-auto px-4 py-20 flex justify-center">
+                <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary" />
+                    <p className="text-muted-foreground">Loading item details...</p>
+                </div>
+            </main>
+        )
+    }
+
+    if (error || !item) {
+        return (
+            <main className="container mx-auto px-4 py-20 flex justify-center">
+                <Card className="w-full max-w-md p-6 text-center">
+                    <div className="flex justify-center mb-4">
+                        <AlertCircle className="h-10 w-10 text-red-500" />
                     </div>
-                  </div>
-                  {/* Favorite button - functionality to be implemented */}
-                  <Button variant="ghost" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </div>
+                    <h2 className="text-xl font-bold mb-2">Error</h2>
+                    <p className="text-muted-foreground mb-4">{error || "Item not found"}</p>
+                    <Button onClick={() => router.push('/browse-items')}>Back to Browse</Button>
+                </Card>
+            </main>
+        )
+    }
 
-                <Separator />
+    const mainImage = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : "/placeholder.svg";
 
-                {/* Item Description */}
-                <div>
-                  <h2 className="font-semibold mb-2">Description</h2>
-                  <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                </div>
+    return (
+        <div>
+            <main className="container mx-auto px-4 py-8">
+                <div className="grid gap-8 lg:grid-cols-3">
 
-                {/* What the seller is looking for (optional field) */}
-                {item.lookingFor && (
-                  <>
-                    <Separator />
-                    <div>
-                      <h2 className="font-semibold mb-2">Looking For</h2>
-                      <p className="text-muted-foreground">{item.lookingFor}</p>
-                    </div>
-                  </>
-                )}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Image */}
+                        <Card className="overflow-hidden">
+                            <div className="aspect-video relative bg-muted">
+                                {/* Note: If mainImage is http link, should set images.remotePatterns in next.config.js */}
+                                <img
+                                    src={mainImage}
+                                    alt={item.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        </Card>
 
-                <Separator />
+                        {/* Main Info */}
+                        <Card>
+                            <CardContent className="p-6 space-y-4">
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex-1">
+                                        <h1 className="text-3xl font-bold text-balance">{item.title}</h1>
+                                        <div className="flex items-center gap-2 mt-2">
+                                            {/* transaction_type */}
+                                            <Badge variant="secondary">{item.transaction_type}</Badge>
+                                            {/* categories */}
+                                            {/*{item.categories && item.categories.length > 0 && (*/}
+                                            {/*    <Badge variant="outline">{item.categories[0].name}</Badge>*/}
+                                            {/*)}*/}
+                                            {item.categories && item.categories.length > 0 && (
+                                                <div className="flex gap-2 flex-wrap">
+                                                    {item.categories.map((cat, idx) => (
+                                                        <Badge
+                                                            key={cat.id ?? `${cat.name ?? 'cat'}-${idx}`}
+                                                            variant="outline"
+                                                        >
+                                                            {cat.name}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            )}
 
-                {/* Item metadata: location and posting date */}
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4" />
-                    {item.location}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    Posted {item.postedDate}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                                            {/* price */}
+                                            <Badge variant="default" className="text-lg">
+                                                ${item.price}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                    <Button variant="ghost" size="icon">
+                                        <Heart className="h-5 w-5" />
+                                    </Button>
+                                </div>
 
-            {/* Trade Request Status Card - only shown if there's an active trade */}
-            {tradeStatus && (
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">Trade Request Status</h2>
-                    <Badge className="capitalize">{tradeStatus}</Badge>
-                  </div>
-                  <Separator />
-                  <div className="space-y-3">
-                    {/* Display the item being offered in trade */}
-                    <p className="text-sm text-muted-foreground">
-                      <strong>Offered Item:</strong> {tradeRequest.offeredItem}
-                    </p>
-                    {/* Action buttons based on trade status */}
-                    {tradeStatus === "pending" && (
-                      <div className="flex gap-2">
-                        <Button onClick={handleAcceptTrade} className="flex-1">
-                          Accept Trade
-                        </Button>
-                        <Button onClick={handleDeclineTrade} variant="outline" className="flex-1 bg-transparent">
-                          Decline
-                        </Button>
-                      </div>
-                    )}
-                    {tradeStatus === "accepted" && (
-                      <Button onClick={handleMarkComplete} className="w-full">
-                        Mark as Complete
-                      </Button>
-                    )}
-                    {/* Cancel option available for pending or accepted trades */}
-                    {(tradeStatus === "pending" || tradeStatus === "accepted") && (
-                      <Button onClick={handleCancelRequest} variant="destructive" className="w-full">
-                        Cancel Request
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                                <Separator />
 
-            {/* Comments Section - allows users to view and post comments */}
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <h2 className="text-lg font-semibold">Comments</h2>
-                <Separator />
+                                <div>
+                                    <h2 className="font-semibold mb-2">Description</h2>
+                                    <p className="text-muted-foreground leading-relaxed">
+                                        {item.description || "No description provided."}
+                                    </p>
+                                </div>
 
-                {/* Comment Form - input field and submit button */}
-                <div className="space-y-3">
+                                <Separator />
+
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                    <div className="flex items-center gap-1">
+                                        <MapPin className="h-4 w-4" />
+                                        Location Hidden {/* TODO: get location */}
+                                    </div>
+                                    <div className="flex items-center gap-1">
+                                        <Calendar className="h-4 w-4" />
+                                        Posted recently
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* TODO: Comment: NOW is MOCK */}
+                        <Card>
+                            <CardContent className="p-6 space-y-4">
+                                <h2 className="text-lg font-semibold">Comments</h2>
+                                <Separator />
+                                <div className="space-y-3">
                   <textarea
-                    value={newComment}
-                    onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Post a comment..."
-                    className="w-full px-3 py-2 border rounded-md bg-background text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    rows={3}
+                      value={newComment}
+                      onChange={(e) => setNewComment(e.target.value)}
+                      placeholder="Post a comment..."
+                      className="w-full px-3 py-2 border rounded-md bg-background"
+                      rows={3}
                   />
-                  <Button onClick={handlePostComment} className="w-full">
-                    Post Comment
-                  </Button>
-                </div>
+                                    <Button onClick={handlePostComment} className="w-full">Post Comment</Button>
+                                </div>
+                                <div className="space-y-4 mt-4">
+                                    {comments.map((comment) => (
+                                        <div key={comment.id} className="flex gap-3">
+                                            <Avatar className="h-8 w-8">
+                                                <AvatarFallback>{comment.author[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="font-semibold text-sm">{comment.author}</span>
+                                                    <span className="text-xs text-muted-foreground">{comment.date}</span>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground">{comment.text}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                <Separator />
-
-                {/* Comments List - displays all comments with author info */}
-                <div className="space-y-4">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3">
-                      {/* Comment author avatar */}
-                      <Avatar className="h-8 w-8 flex-shrink-0">
-                        <AvatarImage src={comment.avatar || "/placeholder.svg"} />
-                        <AvatarFallback>{comment.author[0]}</AvatarFallback>
-                      </Avatar>
-                      {/* Comment content with author name and timestamp */}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">{comment.author}</span>
-                          <span className="text-xs text-muted-foreground">{comment.date}</span>
+                    {/* Right side */}
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-20 space-y-4">
+                            <Card>
+                                <CardContent className="p-6 space-y-4">
+                                    <h2 className="font-semibold">Seller Info</h2>
+                                    <div className="flex items-center gap-3">
+                                        <Avatar className="h-12 w-12">
+                                            <AvatarFallback>U</AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <div className="font-semibold">User</div>
+                                            <div className="text-sm text-muted-foreground">
+                                                Verified User
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button className="w-full" onClick={handleMessageSeller}>
+                                        <MessageCircle className="h-4 w-4 mr-2" />
+                                        Message Seller
+                                    </Button>
+                                    <Button variant="outline" className="w-full bg-transparent" asChild>
+                                        <Link href={`/transactions/request/${item.item_UUID}`}>
+                                            <Package className="h-4 w-4 mr-2" />
+                                            Request Trade
+                                        </Link>
+                                    </Button>
+                                </CardContent>
+                            </Card>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">{comment.text}</p>
-                      </div>
                     </div>
-                  ))}
+
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar - takes 1/3 of the width on large screens, sticky positioned */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-20 space-y-4">
-              {/* Seller Information Card */}
-              <Card>
-                <CardContent className="p-6 space-y-4">
-                  <h2 className="font-semibold">Listed By</h2>
-                  {/* Seller profile with avatar, name, rating, and trade count */}
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={item.seller.avatar || "/placeholder.svg"} />
-                      <AvatarFallback>{item.seller.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <Link href="/profile" className="font-semibold hover:underline">
-                        {item.seller.name}
-                      </Link>
-                      {/* Seller rating and total trades count */}
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Star className="h-3 w-3 fill-primary text-primary" />
-                        <span>{item.seller.rating}</span>
-                        <span>·</span>
-                        <span>{item.seller.totalTrades} trades</span>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Action buttons for contacting seller and requesting trade */}
-                  <Button className="w-full" onClick={handleMessageSeller}>
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Message Seller
-                  </Button>
-                  <Button variant="outline" className="w-full bg-transparent" asChild>
-                    <Link href={`/transactions/request/${item.id}`}>
-                      <Package className="h-4 w-4 mr-2" />
-                      Request Trade
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Safety Tips Card - provides safety guidelines for users */}
-              <Card className="bg-muted/50">
-                <CardContent className="p-6 space-y-2">
-                  <h3 className="font-semibold text-sm">Safety Tips</h3>
-                  <ul className="text-xs text-muted-foreground space-y-1 leading-relaxed">
-                    <li>• Meet in public places</li>
-                    <li>• Inspect items before trading</li>
-                    <li>• Trust your instincts</li>
-                    <li>• Report suspicious activity</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+            </main>
         </div>
-      </main>
-    </div>
-  )
+    )
 }

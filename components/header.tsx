@@ -56,19 +56,26 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/transactions">
-              <Receipt className="h-5 w-5" />
-            </Link>
-          </Button>
-          <Button variant="ghost" size="icon" className="relative" asChild>
-            <Link href="/messages">
-              <MessageCircle className="h-5 w-5" />
-              <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
-                2
-              </Badge>
-            </Link>
-          </Button>
+          {/* Logic: Only show private features (Transactions/Messages) if logged in */}
+          {isLoggedIn && (
+            <>
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/transactions">
+                  <Receipt className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon" className="relative" asChild>
+                <Link href="/messages">
+                  <MessageCircle className="h-5 w-5" />
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs">
+                    2
+                  </Badge>
+                </Link>
+              </Button>
+            </>
+          )}
+
+          {/* Logic: Toggle between Profile icon and Login button */}
           {isLoggedIn ? (
             <Button variant="ghost" size="icon" asChild>
               <Link href="/profile">
@@ -83,8 +90,10 @@ export function Header() {
               </Link>
             </Button>
           )}
+
+          {/* Logic: Redirect to Login if guest tries to list an item */}
           <Button size="sm" asChild>
-            <Link href="/add-item">List Item</Link>
+            <Link href={isLoggedIn ? "/add-item" : "/login"}>List Item</Link>
           </Button>
         </div>
       </div>
