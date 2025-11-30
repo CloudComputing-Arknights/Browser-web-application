@@ -2,9 +2,9 @@ import { Header } from "@/components/header"
 import ItemDetailClient from "./ItemDetailClient"
 
 interface ItemDetailPageProps {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>;
 }
 
 // Server Component

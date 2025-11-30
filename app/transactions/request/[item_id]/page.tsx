@@ -2,9 +2,9 @@ import { Header } from "@/components/header"
 import RequestTradeClient from "./RequestTradeClient"
 
 interface RequestTradePageProps {
-  params: {
+  params: Promise<{
     item_id: string
-  }
+  }>;
 }
 
 // Dynamic rendering to fetch item data from backend

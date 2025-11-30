@@ -15,6 +15,8 @@ Name | Type | Description | Notes
 **image_urls** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
 **item_UUID** | **string** |  | [default to undefined]
 **categories** | [**Array&lt;CategoryRead&gt;**](CategoryRead.md) |  | [optional] [default to undefined]
+**address** | [**AddressBase**](AddressBase.md) |  | [optional] [default to undefined]
+**user** | [**PublicUserRes**](PublicUserRes.md) |  | [optional] [default to undefined]
 **created_at** | **string** |  | [optional] [default to undefined]
 **updated_at** | **string** |  | [optional] [default to undefined]
 
@@ -33,6 +35,8 @@ const instance: ItemRead = {
     image_urls,
     item_UUID,
     categories,
+    address,
+    user,
     created_at,
     updated_at,
 };
