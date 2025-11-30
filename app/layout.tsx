@@ -1,10 +1,11 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
-import { Analytics } from '@vercel/analytics/next'
-import './globals.css'
+import type { Metadata } from "next"
+import { Geist, Geist_Mono } from "next/font/google"
+import { Analytics } from "@vercel/analytics/next"
+import "./globals.css"
+import { GoogleProvider } from "./GoogleProvider"
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
+const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
   title: 'v0 App',
@@ -14,43 +15,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body className={`font-sans antialiased`}>
-        {children}
-        <Analytics />
-      </body>
-    </html>
-  )
-}
-
-"use client"
-
-import { GoogleOAuthProvider } from "@react-oauth/google"
-import React from "react"
-
-const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!
-
-export function GoogleProvider({ children }: { children: React.ReactNode }) {
-  return <GoogleOAuthProvider clientId={clientId}>{children}</GoogleOAuthProvider>
-}
-
-import type { Metadata } from "next"
-import { GoogleProvider } from "./GoogleProvider"
-
-export const metadata: Metadata = {
-  title: "SwapHub",
-  description: "Neighborhood exchange",
-}
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <body>
-        <GoogleProvider>{children}</GoogleProvider>
+    <html lang="en" className={`${geist.variable} ${geistMono.variable}`}>
+      <body className="font-sans antialiased">
+        <GoogleProvider>
+          {children}
+          <Analytics />
+        </GoogleProvider>
       </body>
     </html>
   )
