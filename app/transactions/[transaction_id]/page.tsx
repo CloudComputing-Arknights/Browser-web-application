@@ -1,3 +1,4 @@
+import { Header } from "@/components/header"
 import TransactionDetailClient from "./TransactionDetailClient"
 
 interface TransactionDetailPageProps {
@@ -6,11 +7,14 @@ interface TransactionDetailPageProps {
   }
 }
 
-// Required for static export
-export function generateStaticParams() {
-  return []
-}
+export default async function TransactionDetailPage({ params }: TransactionDetailPageProps) {
+  const awaitedParams = await params
+  const transactionId = awaitedParams.transaction_id
 
-export default function TransactionDetailPage({ params }: TransactionDetailPageProps) {
-  return <TransactionDetailClient transactionId={params.transaction_id} />
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      <TransactionDetailClient transactionId={transactionId} />
+    </div>
+  )
 }
