@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -203,24 +202,19 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center h-64">
               <p className="text-muted-foreground">Loading transaction details...</p>
             </div>
           </div>
         </main>
-      </div>
     )
   }
 
   if (error || !transaction) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col items-center justify-center h-64 space-y-4">
               <p className="text-destructive">{error || "Transaction not found"}</p>
@@ -230,7 +224,6 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
             </div>
           </div>
         </main>
-      </div>
     )
   }
 
@@ -242,9 +235,7 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
   )
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto px-4 py-8">
+    <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-6">
             <Link href="/transactions" className="text-sm text-muted-foreground hover:underline">
@@ -442,7 +433,6 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
           </div>
         </div>
       </main>
-    </div>
   )
 }
 

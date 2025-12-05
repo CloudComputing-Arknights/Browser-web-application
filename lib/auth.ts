@@ -140,3 +140,42 @@ export function logoutUser(): void {
 
   }
 }
+
+type GoogleLoginRequest = {
+  id_token: string
+}
+
+export async function loginWithGoogle(idToken: string): Promise<boolean> {
+  try {
+    if (!API_BASE_URL) {
+      console.error("NEXT_PUBLIC_API_BASE_URL is not set")
+      return false
+    }
+
+    const res = await fetch(`${API_BASE_URL}/auth/google`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id_token: idToken } satisfies GoogleLoginRequest),
+    })
+
+    if (!res.ok) {
+      console.error("Google login failed with status:", res.status)
+      return false
+    }
+
+    const data = (await res.json()) as LoginResponse
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("access_token", data.access_token)
+      localStorage.setItem("token_type", data.token_type ?? "bearer")
+    }
+
+    setUserLoggedIn(true)
+    return true
+  } catch (err) {
+    console.error("Google login error:", err)
+    return false
+  }
+}
