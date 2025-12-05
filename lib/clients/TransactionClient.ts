@@ -62,8 +62,8 @@ export default class TransactionClient {
     } = options;
     const res = await api.listTransactionsTransactionsGet(
       status,
-      initiatorUserId,
-      receiverUserId,
+      // initiatorUserId,
+      // receiverUserId,
       requestedItemId,
       type,
       limit,

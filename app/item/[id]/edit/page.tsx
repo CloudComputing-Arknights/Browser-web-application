@@ -1,9 +1,9 @@
 import EditItemClient from "./EditItemClient"
 
 interface EditItemPageProps {
-    params: {
+    params: Promise<{
         id: string
-    }
+    }>;
 }
 
 export default async function EditItemPage({ params }: EditItemPageProps) {
