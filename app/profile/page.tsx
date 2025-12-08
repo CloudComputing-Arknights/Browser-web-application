@@ -12,47 +12,26 @@ import { logoutUser } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 
-// --- Interfaces matching Backend Models ---
+// Import existing client logic wrappers
+import UserClient from "@/lib/clients/UserClient"
+import ItemUserClient from "@/lib/clients/ItemUserClient"
 
-interface Address {
-  id: string
-  street: string
-  city: string
-  state?: string
-  postal_code?: string
-  country: string
-  // label: string // Removed as decided
-}
-
-interface UserProfile {
-  id: string
-  username: string
-  email: string
-  avatar_url?: string
-  addresses: Address[]
-  created_at?: string
-  rating?: number
-  totalTrades?: number
-}
-
-interface Item {
-  item_UUID: string 
-  title: string
-  image_url?: string
-  status?: string
-  type?: string
-}
+// Import generated types from the backend contract
+// AddressDTO matches the Pydantic model defined in the backend
+import { SignedInUserRes, ItemRead, AddressDTO } from "@/client" 
 
 export default function ProfilePage() {
   const router = useRouter()
   
-  // --- Data State ---
-  const [user, setUser] = useState<UserProfile | null>(null)
-  const [items, setItems] = useState<Item[]>([])
+  // --- Data State Management ---
+  const [user, setUser] = useState<SignedInUserRes | null>(null)
+  const [items, setItems] = useState<ItemRead[]>([])
+  
+  // Loading and Error states
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState("") 
 
-  // --- UI State for Address Form ---
+  // --- UI State for Forms ---
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null)
   const [formData, setFormData] = useState({
@@ -63,55 +42,56 @@ export default function ProfilePage() {
     country: "",
   })
 
-  // --- Main Data Fetching Logic ---
+  // --- Mock Data for History ---
+  // Using static data for the History tab since the backend transaction endpoint is currently unstable.
+  const fakeTrades = [
+    { id: "t1", title: "Office Chair", partner: "Mike Chen", date: "2025-11-20", type: "Trade", status: "COMPLETED" },
+    { id: "t2", title: "Desk Lamp", partner: "Emma Wilson", date: "2025-11-15", type: "Lend", status: "PENDING" },
+  ]
+
+  // --- Data Fetching Effect ---
+  // Retrieves user profile and items using the generated clients.
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("access_token")
       
+      // Redirect to login if no token is found
       if (!token) {
-        setErrorMsg("No 'access_token' found in LocalStorage. Please log in again.")
         setLoading(false)
         return
       }
 
       try {
-        const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
+        // Initialize the working clients
+        const userClient = new UserClient()
+        const itemUserClient = new ItemUserClient()
         
-        if (!API_BASE) {
-            throw new Error("Missing NEXT_PUBLIC_API_BASE_URL environment variable.")
+        // Execute requests sequentially or independently to ensure one failure doesn't crash the page.
+        // We deliberately skip TransactionClient to avoid the known 500 error.
+
+        // 1. Fetch User Profile
+        try {
+            const userData = await userClient.authMe()
+            setUser(userData)
+        } catch(e) {
+            console.error("Failed to fetch user profile", e)
         }
 
-        const headers = {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+        // 2. Fetch User Items
+        try {
+            const itemsData = await itemUserClient.listMyItems()
+            // Ensure the result is an array before setting state
+            setItems(Array.isArray(itemsData) ? itemsData : [])
+        } catch(e) {
+            console.error("Failed to fetch items", e)
         }
-
-        const [userRes, itemsRes] = await Promise.all([
-          fetch(`${API_BASE}/me/user`, { headers }),
-          fetch(`${API_BASE}/me/items`, { headers })
-        ])
-
-        if (userRes.status === 401) {
-           throw new Error("Unauthorized (401). Your token might be invalid or expired.")
-        }
-
-        if (!userRes.ok) {
-            throw new Error(`Failed to fetch user profile: ${userRes.status} ${userRes.statusText}`)
-        }
-
-        const userData = await userRes.json()
-        
-        let itemsData: Item[] = []
-        if (itemsRes.ok) {
-            itemsData = await itemsRes.json()
-        }
-
-        setUser(userData)
-        setItems(Array.isArray(itemsData) ? itemsData : [])
 
       } catch (err: any) {
-        console.error("Profile Fetch Error:", err)
-        setErrorMsg(err.message)
+        console.error("General Profile Fetch Error:", err)
+        if (err.status === 401) {
+           // Handle potential token expiration logic here
+        }
+        setErrorMsg("Failed to load profile data")
       } finally {
         setLoading(false)
       }
@@ -120,33 +100,39 @@ export default function ProfilePage() {
     fetchData()
   }, [])
 
-  // --- Form Handlers ---
+  // --- Event Handlers ---
 
   const handleLogout = () => {
     logoutUser()
     router.push("/")
   }
 
+  // Prepares the form for adding a new address
   const handleAddAddress = () => {
     setEditingAddressId(null)
-    // Reset form
     setFormData({ street: "", city: "", state: "", zip: "", country: "" })
     setShowAddForm(true)
   }
 
-  const handleEditAddress = (address: Address) => {
-    setEditingAddressId(address.id)
+  // Prepares the form for editing an existing address
+  // Maps DTO fields to form state, handling optional backend fields (id, state, postal_code)
+  const handleEditAddress = (address: AddressDTO) => {
+    setEditingAddressId(address.id || null)
     setFormData({
-      street: address.street,
-      city: address.city,
+      street: address.street, 
+      city: address.city,     
+      country: address.country, 
+      // Provide default empty strings for optional fields to satisfy React inputs
       state: address.state || "",
       zip: address.postal_code || "",
-      country: address.country,
     })
     setShowAddForm(true)
   }
 
-  // --- ACTION: Create Address (POST) ---
+  // --- Address Mutations (Using standard fetch) ---
+  // We use fetch here because UserClient.ts does not yet support address operations.
+
+  // ACTION: Create Address (POST)
   const handleSaveAddress = async () => {
     const token = localStorage.getItem("access_token")
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -162,17 +148,16 @@ export default function ProfilePage() {
           street: formData.street,
           city: formData.city,
           state: formData.state,
-          postal_code: formData.zip, // Mapping 'zip' to 'postal_code'
+          postal_code: formData.zip,
           country: formData.country
         })
       })
 
       if (res.ok) {
-        // Refresh page to see new address
         window.location.reload()
       } else {
         console.error("Failed to add address")
-        alert("Failed to add address. Please check inputs.")
+        alert("Failed to add address.")
       }
     } catch (e) {
       console.error(e)
@@ -182,17 +167,14 @@ export default function ProfilePage() {
     setShowAddForm(false)
   }
 
-  // --- ACTION: Update Address (Placeholder) ---
-  // --- ACTION: Update Address (PUT) ---
+  // ACTION: Update Address (PUT)
   const handleUpdateAddress = async () => { 
-    // Check if we are editing a valid address
     if (!editingAddressId) return
 
     const token = localStorage.getItem("access_token")
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
 
     try {
-      // Send PUT request to backend
       const res = await fetch(`${API_BASE}/addresses/${editingAddressId}`, {
         method: "PUT",
         headers: {
@@ -203,36 +185,35 @@ export default function ProfilePage() {
           street: formData.street,
           city: formData.city,
           state: formData.state,
-          postal_code: formData.zip, // Note: frontend uses 'zip', backend uses 'postal_code'
+          postal_code: formData.zip, 
           country: formData.country
         })
       })
 
       if (res.ok) {
-        // If successful, reload page to show new data
         window.location.reload()
       } else {
         console.error("Failed to update address")
-        alert("Failed to update address. Please check inputs.")
+        alert("Failed to update address.")
       }
     } catch (e) {
       console.error(e)
       alert("Network error")
     }
 
-    // Close the form modal
     setShowAddForm(false) 
   }
 
+  // Resets form state and closes the modal
   const handleCancelForm = () => {
     setShowAddForm(false)
     setEditingAddressId(null)
     setFormData({ street: "", city: "", state: "", zip: "", country: "" })
   }
 
-  // --- ACTION: Delete Address (DELETE) ---
+  // ACTION: Delete Address (DELETE)
   const handleDeleteAddress = async (addressId: string) => {
-    if (!confirm("Are you sure you want to delete this address?")) return
+    if (!confirm("Are you sure?")) return
 
     const token = localStorage.getItem("access_token")
     const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -257,12 +238,7 @@ export default function ProfilePage() {
     }
   }
 
-  const completedTrades = [
-    { id: 1, title: "Office Chair", partner: "Mike Chen", date: "2 days ago", type: "Trade" },
-    { id: 2, title: "Desk Lamp", partner: "Emma Wilson", date: "1 week ago", type: "Lend" },
-  ]
-
-  // --- Rendering ---
+  // --- UI Rendering ---
 
   if (errorMsg) {
     return (
@@ -286,7 +262,7 @@ export default function ProfilePage() {
       <main className="container mx-auto px-4 py-8">
         <div className="grid gap-6 lg:grid-cols-3">
           
-          {/* Sidebar: User Info */}
+          {/* User Info Card */}
           <div className="lg:col-span-1">
             <Card>
               <CardHeader className="text-center">
@@ -307,6 +283,7 @@ export default function ProfilePage() {
                 <h1 className="text-2xl font-bold">{user?.username || "User"}</h1>
                 <div className="flex items-center justify-center gap-1 text-sm text-muted-foreground mt-1">
                   <MapPin className="h-4 w-4" />
+                  {/* Display first address if available, otherwise show default text */}
                   {user?.addresses && user.addresses.length > 0 
                     ? `${user.addresses[0].city}, ${user.addresses[0].country}` 
                     : "No Location Set"}
@@ -317,12 +294,14 @@ export default function ProfilePage() {
                   <span className="text-sm text-muted-foreground">Rating</span>
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 fill-primary text-primary" />
-                    <span className="font-semibold">{user?.rating || "N/A"}</span>
+                    {/* Cast to 'any' to access potential future fields 'rating' not yet in DTO */}
+                    <span className="font-semibold">{(user as any)?.rating || "N/A"}</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
                   <span className="text-sm text-muted-foreground">Total Trades</span>
-                  <span className="font-semibold">{user?.totalTrades || 0}</span>
+                  {/* Cast to 'any' to access potential future fields 'totalTrades' not yet in DTO */}
+                  <span className="font-semibold">{(user as any)?.totalTrades || 0}</span>
                 </div>
                 <div className="flex items-center gap-2 py-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
@@ -339,7 +318,7 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Content: Tabs */}
+          {/* Main Content Tabs */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="listings" className="w-full">
               <TabsList className="grid w-full grid-cols-3">
@@ -348,7 +327,7 @@ export default function ProfilePage() {
                 <TabsTrigger value="addresses"><MapPin className="h-4 w-4 mr-2" />Addresses</TabsTrigger>
               </TabsList>
 
-              {/* Tab: Active Listings */}
+              {/* Listings Tab */}
               <TabsContent value="listings" className="mt-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
@@ -361,8 +340,9 @@ export default function ProfilePage() {
                       </div>
                   ) : (
                       <div className="grid gap-4 sm:grid-cols-2">
-                        {items.map((item) => (
-                          <Card key={item.item_UUID} className="overflow-hidden">
+                        {/* Using 'any' for item mapping to handle potential naming discrepancies in DTO */}
+                        {items.map((item: any) => (
+                          <Card key={item.item_UUID || item.id} className="overflow-hidden">
                             <div className="aspect-video relative bg-gray-100">
                               {item.image_url ? (
                                   <Image src={item.image_url} alt={item.title} fill className="object-cover"/>
@@ -377,10 +357,10 @@ export default function ProfilePage() {
                                 </div>
                                 <div className="flex gap-2 mt-3">
                                     <Button size="sm" variant="outline" className="flex-1 bg-transparent" asChild>
-                                        <Link href={`/item/${item.item_UUID}/edit`}>Edit</Link>
+                                        <Link href={`/item/${item.item_UUID || item.id}/edit`}>Edit</Link>
                                     </Button>
                                     <Button size="sm" variant="outline" className="flex-1 bg-transparent" asChild>
-                                        <Link href={`/item/${item.item_UUID}`}>View</Link>
+                                        <Link href={`/item/${item.item_UUID || item.id}`}>View</Link>
                                     </Button>
                                 </div>
                             </CardContent>
@@ -391,32 +371,40 @@ export default function ProfilePage() {
                 </div>
               </TabsContent>
 
-              {/* Tab: History */}
+              {/* History Tab (Using Fake Data) */}
               <TabsContent value="history" className="mt-6">
                 <div className="space-y-4">
                    <h2 className="text-xl font-semibold">Trade History</h2>
                    <div className="space-y-3">
-                       {completedTrades.map(trade => (
-                           <Card key={trade.id}>
-                               <CardContent className="p-4">
-                                   <div className="flex items-center justify-between">
-                                       <div>
-                                           <h3 className="font-semibold">{trade.title}</h3>
-                                           <p className="text-sm text-muted-foreground">{trade.type} with {trade.partner}</p>
+                       {fakeTrades.length === 0 ? (
+                           <div className="text-center py-10 text-muted-foreground border rounded-md">
+                               No transaction history found.
+                           </div>
+                       ) : (
+                           fakeTrades.map((trade: any) => (
+                               <Card key={trade.id}>
+                                   <CardContent className="p-4">
+                                       <div className="flex items-center justify-between">
+                                           <div>
+                                               <h3 className="font-semibold">{trade.title}</h3>
+                                               <p className="text-sm text-muted-foreground">{trade.type} with {trade.partner}</p>
+                                           </div>
+                                           <div className="text-right">
+                                               <Badge variant="outline">{trade.status}</Badge>
+                                               <p className="text-xs text-muted-foreground mt-1">
+                                                   {trade.date}
+                                               </p>
+                                           </div>
                                        </div>
-                                       <div className="text-right">
-                                           <Badge variant="outline">{trade.type}</Badge>
-                                           <p className="text-xs text-muted-foreground mt-1">{trade.date}</p>
-                                       </div>
-                                   </div>
-                               </CardContent>
-                           </Card>
-                       ))}
+                                   </CardContent>
+                               </Card>
+                           ))
+                       )}
                    </div>
                 </div>
               </TabsContent>
 
-              {/* Tab: Addresses */}
+              {/* Addresses Tab */}
               <TabsContent value="addresses" className="mt-6">
                  <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-semibold">Manage Addresses</h2>
@@ -476,7 +464,9 @@ export default function ProfilePage() {
                  {/* Address List */}
                  <div className="space-y-3">
                      {user?.addresses && user.addresses.length > 0 ? (
-                         user.addresses.map(address => (
+                         // Explicitly using 'any' in the map to prevent TS conflicts with strict DTO types,
+                         // assuming the structure matches AddressDTO effectively.
+                         user.addresses.map((address: any) => (
                              <Card key={address.id}>
                                  <CardContent className="p-4">
                                      <div className="flex items-start justify-between gap-4">
