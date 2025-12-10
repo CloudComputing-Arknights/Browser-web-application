@@ -36,7 +36,7 @@ export default function TransactionsPage() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        
+
         // Check login status
         if (!isUserLoggedIn()) {
           setError("Please log in to view transactions")
@@ -117,9 +117,9 @@ export default function TransactionsPage() {
       const transactionClient = new TransactionClient()
       const itemsClient = new ItemsClient()
       const userClient = new UserClient()
-      
+
       const data = await transactionClient.listTransactions({ limit: 100, offset: 0 })
-      
+
       const enrichedData: EnrichedTransaction[] = await Promise.all(
         data.map(async (transaction) => {
           const enriched: EnrichedTransaction = {
@@ -156,7 +156,7 @@ export default function TransactionsPage() {
           return enriched
         })
       )
-      
+
       setTransactions(enrichedData)
     } catch (err) {
       console.error("Failed to refresh transactions:", err)
@@ -167,7 +167,7 @@ export default function TransactionsPage() {
   const handleAcceptTrade = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     try {
       const client = new TransactionClient()
       await client.updateTransaction(transactionId, { status: "accepted" })
@@ -182,7 +182,7 @@ export default function TransactionsPage() {
   const handleDecline = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     try {
       const client = new TransactionClient()
       await client.updateTransaction(transactionId, { status: "rejected" })
@@ -197,7 +197,7 @@ export default function TransactionsPage() {
   const handleCancelRequest = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     try {
       const client = new TransactionClient()
       await client.updateTransaction(transactionId, { status: "canceled" })
@@ -212,7 +212,7 @@ export default function TransactionsPage() {
   const handleMarkAsComplete = async (e: React.MouseEvent, transactionId: string) => {
     e.preventDefault()
     e.stopPropagation()
-    
+
     try {
       const client = new TransactionClient()
       await client.updateTransaction(transactionId, { status: "completed" })
@@ -309,7 +309,7 @@ export default function TransactionsPage() {
                   </Card>
                 ) : (
                   pendingTransactions.map((request) => (
-                    <Link key={request.transaction_id} href={`/transactions/${request.transaction_id}`}>
+                    <Link key={request.transaction_id} href={`/transactions/detail?id=${request.transaction_id}`}>
                       <Card className="cursor-pointer hover:border-primary/50 transition-colors">
                         <CardContent className="p-6">
                           <div className="flex items-start justify-between mb-4">
@@ -341,7 +341,7 @@ export default function TransactionsPage() {
                                     {request.requested_item?.title || `Item ID: ${request.requested_item_id.slice(0, 8)}...`}
                                   </h3>
                                   <p className="text-xs text-muted-foreground mt-1">
-                                    {request.type_display === "received" 
+                                    {request.type_display === "received"
                                       ? `From: ${request.initiator_user?.username || request.initiator_user_id.slice(0, 8) + '...'}`
                                       : `Owner: ${request.receiver_user?.username || request.receiver_user_id.slice(0, 8) + '...'}`
                                     }
@@ -397,8 +397,8 @@ export default function TransactionsPage() {
                           {/* Actions */}
                           {request.type_display === "received" ? (
                             <div className="flex gap-3 mt-6">
-                              <Button 
-                                className="flex-1" 
+                              <Button
+                                className="flex-1"
                                 onClick={(e) => handleAcceptTrade(e, request.transaction_id)}
                               >
                                 <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -443,7 +443,7 @@ export default function TransactionsPage() {
                   </Card>
                 ) : (
                   activeTransactions.map((transaction) => (
-                    <Link key={transaction.transaction_id} href={`/transactions/${transaction.transaction_id}`}>
+                    <Link key={transaction.transaction_id} href={`/transactions/detail?id=${transaction.transaction_id}`}>
                       <Card className="cursor-pointer hover:border-primary/50 transition-colors">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
@@ -462,7 +462,7 @@ export default function TransactionsPage() {
                                     {transaction.requested_item?.title || `Item: ${transaction.requested_item_id.slice(0, 12)}...`}
                                   </h3>
                                   <p className="text-sm text-muted-foreground mt-1">
-                                    With: {transaction.type_display === "sent" 
+                                    With: {transaction.type_display === "sent"
                                       ? transaction.receiver_user?.username || transaction.receiver_user_id.slice(0, 12) + '...'
                                       : transaction.initiator_user?.username || transaction.initiator_user_id.slice(0, 12) + '...'
                                     }
@@ -521,7 +521,7 @@ export default function TransactionsPage() {
                   </Card>
                 ) : (
                   completedTransactions.map((transaction) => (
-                    <Link key={transaction.transaction_id} href={`/transactions/${transaction.transaction_id}`}>
+                    <Link key={transaction.transaction_id} href={`/transactions/detail?id=${transaction.transaction_id}`}>
                       <Card className="cursor-pointer hover:border-primary/50 transition-colors">
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">

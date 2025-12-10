@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {X, Loader2, Save, User} from "lucide-react"
+import { X, Loader2, Save, User } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -102,7 +102,7 @@ export default function EditItemClient({ itemId }: EditItemClientProps) {
             )
 
             toast.success("Item has been successfully updated！")
-            router.push(`/item/${itemId}`)
+            router.push(`/item?id=${itemId}`)
             router.refresh()
 
         } catch (error: any) {
@@ -278,7 +278,7 @@ export default function EditItemClient({ itemId }: EditItemClientProps) {
                                 Save Changes
                             </Button>
                             <Button variant="outline" className="flex-1 bg-transparent" asChild>
-                                <Link href={`/item/${itemId}`}>Cancel</Link>
+                                <Link href={`/item?id=${itemId}`}>Cancel</Link>
                             </Button>
                         </div>
                     </CardContent>

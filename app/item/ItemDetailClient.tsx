@@ -186,13 +186,13 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                                 <h2 className="text-lg font-semibold">Comments</h2>
                                 <Separator />
                                 <div className="space-y-3">
-                  <textarea
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      placeholder="Post a comment..."
-                      className="w-full px-3 py-2 border rounded-md bg-background"
-                      rows={3}
-                  />
+                                    <textarea
+                                        value={newComment}
+                                        onChange={(e) => setNewComment(e.target.value)}
+                                        placeholder="Post a comment..."
+                                        className="w-full px-3 py-2 border rounded-md bg-background"
+                                        rows={3}
+                                    />
                                     <Button onClick={handlePostComment} className="w-full">Post Comment</Button>
                                 </div>
                                 <div className="space-y-4 mt-4">
@@ -237,7 +237,7 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                                         Message Seller
                                     </Button>
                                     <Button variant="outline" className="w-full bg-transparent" asChild>
-                                        <Link href={`/transactions/request/${item.item_UUID}`}>
+                                        <Link href={`/transactions/request?item_id=${item.item_UUID}`}>
                                             <Package className="h-4 w-4 mr-2" />
                                             Request Trade
                                         </Link>
