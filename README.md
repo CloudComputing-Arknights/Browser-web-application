@@ -55,9 +55,18 @@ Follow these steps to set up and run the project locally:
 7. Again, open [http://localhost:3000](http://localhost:3000) in your browser to ensure the static export runs correctly.
 
 8. If everything works as expected, upload the contents of the `/out` folder to your Google Cloud Storage bucket. Then, navigate to `https://your-bucket-name.storage.googleapis.com/index.html` in your browser (ensure the bucket allows public access).
+```
+# remove old files
+gcloud storage rm -r gs://our-bucket-name/**
 
+# upload new files
+gcloud storage cp --recursive out/* gs://our-bucket-name
+
+```
 ### OpenAPI Client
 
 ```bash
 openapi-generator-cli generate -i openapi.json -g typescript-axios -o client
 ```
+## Trouble Shooting
+If you cannot deploy this locally, try to comment out `assetPrefix:` in `next.config.mjs`

@@ -6,7 +6,7 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "serve out"
+    "start": "serve -s out -l 8080"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
