@@ -1,7 +1,53 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { initializeApp, getApps } from 'firebase/app';
+import type { MessagePayload, Messaging } from 'firebase/messaging';
+
+// --- Firebase Configuration ---
+const firebaseConfig = {
+  apiKey: "AIzaSyBoS91U_Zfppcv1R_bAm3kQthwN5CZOsiI",
+  authDomain: "cloud-computing-arknights.firebaseapp.com",
+  projectId: "cloud-computing-arknights",
+  storageBucket: "cloud-computing-arknights.firebasestorage.app",
+  messagingSenderId: "977633385476",
+  appId: "1:977633385476:web:66871b4a2182ba42196951",
+  measurementId: "G-19JP5NW39G"
+};
+
+/**
+ * Firebase Messaging is not available in every runtime (SSR, some browsers, etc).
+ * Never initialize it at module scope; gate it behind `isSupported()` in the browser.
+ */
+let messagingInitPromise: Promise<Messaging | null> | null = null;
+let serviceWorkerRegistration: ServiceWorkerRegistration | null = null;
+
+async function getMessagingSafe(): Promise<Messaging | null> {
+  if (typeof window === "undefined") return null;
+
+  if (!messagingInitPromise) {
+    messagingInitPromise = (async () => {
+      const { isSupported, getMessaging } = await import("firebase/messaging");
+      const supported = await isSupported();
+      if (!supported) return null;
+
+      const app = getApps().length ? getApps()[0]! : initializeApp(firebaseConfig);
+      return getMessaging(app);
+    })().catch((err) => {
+      console.warn("Failed to initialize Firebase Messaging:", err);
+      return null;
+    });
+  }
+
+  return messagingInitPromise;
+}
+
+// Cache Token
+let cachedToken: string | null = null;
+const VAPID_KEY = 'BKN0bH0kaCV2nhLSU3KEkk60XfTwfyISgu3y9UalnEUVzy6s0omDAUYiqeBP95H2XN-awF8jbaYa0eGFmYEGagc';
+
 // Configure backend URL (in production, this should be in .env file)
 const API_BASE_URL = "http://127.0.0.1:8000";
+
 // --- 1. Define interfaces (DTO) ---
 // These interfaces should match the response_model from your FastAPI backend
 interface UploadResponse {
@@ -24,6 +70,86 @@ const ImageUploader: React.FC = () => {
   const [uploadedUuid, setUploadedUuid] = useState<string | null>(null);
   const [displayUrl, setDisplayUrl] = useState<string | null>(null);
 
+  // --- Firebase Setup & Service Worker ---
+  useEffect(() => {
+    let unsubscribe: (() => void) | undefined;
+
+    (async () => {
+      const messaging = await getMessagingSafe();
+      if (!messaging) return;
+
+      // Register Service Worker (required for FCM in most browsers)
+      if ("serviceWorker" in navigator) {
+        try {
+          serviceWorkerRegistration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+          console.log("Service Worker registration successful with scope: ", serviceWorkerRegistration.scope);
+        } catch (err) {
+          console.log("Service Worker registration failed: ", err);
+        }
+      }
+
+      // Listen for foreground messages
+      const { onMessage } = await import("firebase/messaging");
+      unsubscribe = onMessage(messaging, (payload: MessagePayload) => {
+        console.log("Received foreground message:", payload);
+        const title = payload.notification?.title || "New Message";
+        const body = payload.notification?.body || "";
+
+        // Demo-friendly: always show a simple popup so it's obvious the message arrived.
+        // (System notifications can be blocked/silenced by browser/OS settings.)
+        alert(`${title}: ${body}`);
+
+        // Optional: also try a system notification if available/allowed.
+        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+          try {
+            new Notification(title, { body, icon: "/icon.svg" });
+          } catch {
+            // ignore
+          }
+        }
+      });
+    })();
+
+    return () => unsubscribe?.();
+  }, []);
+
+  /**
+   * Get FCM Token
+   */
+  async function getFcmToken(): Promise<string | null> {
+    if (cachedToken) {
+      return cachedToken;
+    }
+
+    if (typeof window === "undefined" || !("Notification" in window)) {
+      return null;
+    }
+
+    try {
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        const messaging = await getMessagingSafe();
+        if (!messaging) return null;
+
+        const { getToken } = await import("firebase/messaging");
+        const token = await getToken(messaging, {
+          vapidKey: VAPID_KEY,
+          serviceWorkerRegistration: serviceWorkerRegistration ?? undefined,
+        });
+        if (token) {
+          console.log('Token retrieved:', token);
+          cachedToken = token;
+          return token;
+        }
+      } else {
+        console.warn('Notification permission denied');
+      }
+    } catch (error) {
+      console.error('Error retrieving token:', error);
+    }
+    return null;
+  }
 
  // #########################################################
  // core logic for image upload and get signed url to display image
@@ -50,9 +176,18 @@ const ImageUploader: React.FC = () => {
     setError(null);
 
     try {
+      // Step 0: Get FCM Token
+      const fcmToken = await getFcmToken();
+      if (!fcmToken) {
+          console.warn("Could not get FCM token, proceeding without it.");
+      }
+
       // Step A: Create FormData
       const formData = new FormData();
       formData.append("file", selectedFile);
+      if (fcmToken) {
+          formData.append("fcm_token", fcmToken);
+      }
 
       // Step B: send upload request
       const uploadRes = await fetch(`${API_BASE_URL}/image/upload`, {
@@ -242,4 +377,3 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 export default ImageUploader;
-

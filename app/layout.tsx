@@ -8,9 +8,9 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-sans" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono" })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
-  generator: 'v0.app',
+  title: 'Arknights-SwapHub',
+  description: 'Arknights-SwapHub is a platform for trading items with your neighbors.',
+  generator: 'Cloud Computing Team Arknights',
 }
 
 export default function RootLayout({

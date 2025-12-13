@@ -69,4 +69,4 @@ gcloud storage cp --recursive out/* gs://our-bucket-name
 openapi-generator-cli generate -i openapi.json -g typescript-axios -o client
 ```
 ## Trouble Shooting
-If you cannot deploy this locally, try to comment out `assetPrefix:` in `next.config.mjs`
+If you encounter path rendering issues or have trouble running the app locally, try commenting out the `assetPrefix:` line in `next.config.mjs`.

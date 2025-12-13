@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  trailingSlash: true,
 
   assetPrefix: 'https://storage.googleapis.com/cloud-computing-web-ui-app/', // comment this out when deploying locally
   eslint: {
