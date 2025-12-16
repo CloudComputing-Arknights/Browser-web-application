@@ -8,11 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { ArrowRightLeft, CheckCircle2, Clock, MessageCircle, XCircle } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import TransactionClient from "@/lib/clients/TransactionClient"
 import ItemsClient from "@/lib/clients/ItemsClient"
 import UserClient from "@/lib/clients/UserClient"
 import type { TransactionRes, ItemRead, PublicUserRes } from "@/client"
+import { ResolvedImage } from "@/components/resolved-image"
 
 interface TransactionDetailClientProps {
   transactionId: string
@@ -263,11 +263,10 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
                     <p className="text-sm font-medium text-muted-foreground">Requested Item</p>
                     <div className="space-y-3">
                       <div className="relative h-32 w-full rounded-lg overflow-hidden border">
-                        <Image
-                          src={requestedItem?.image_urls?.[0] || "/placeholder.svg"}
+                        <ResolvedImage
+                          imageRef={requestedItem?.image_urls?.[0] || "/placeholder.svg"}
                           alt={requestedItem?.title || "Requested Item"}
-                          fill
-                          className="object-cover"
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                       <div>
@@ -304,11 +303,10 @@ export default function TransactionDetailClient({ transactionId }: TransactionDe
                     {transaction.type === "trade" && offeredItem ? (
                       <div className="space-y-3">
                         <div className="relative h-32 w-full rounded-lg overflow-hidden border">
-                          <Image
-                            src={offeredItem.image_urls?.[0] || "/placeholder.svg"}
+                          <ResolvedImage
+                            imageRef={offeredItem.image_urls?.[0] || "/placeholder.svg"}
                             alt={offeredItem.title || "Offered Item"}
-                            fill
-                            className="object-cover"
+                            className="absolute inset-0 h-full w-full object-cover"
                           />
                         </div>
                         <div>

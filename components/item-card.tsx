@@ -1,8 +1,8 @@
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { MapPin, User } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
+import { ResolvedImage } from "@/components/resolved-image"
 
 interface ItemCardProps {
   item: {
@@ -21,11 +21,10 @@ export function ItemCard({ item }: ItemCardProps) {
     <Link href={`/item?id=${item.id}`} className="block">
       <Card className="group overflow-hidden transition-all hover:shadow-lg">
         <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-          <Image
-            src={item.image || "/placeholder.svg"}
+          <ResolvedImage
+            imageRef={item.image || "/placeholder.svg"}
             alt={item.title}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
           <Badge className="absolute right-3 top-3 bg-background/90 text-foreground backdrop-blur">
             {item.category}

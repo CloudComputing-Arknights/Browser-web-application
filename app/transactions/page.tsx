@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Clock, CheckCircle2, XCircle, ArrowRightLeft } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import TransactionClient from "@/lib/clients/TransactionClient"
 import ItemsClient from "@/lib/clients/ItemsClient"
 import UserClient from "@/lib/clients/UserClient"
 import type { TransactionRes, ItemRead, PublicUserRes } from "@/client"
 import { fetchCurrentUser, isUserLoggedIn } from "@/lib/auth"
+import { ResolvedImage } from "@/components/resolved-image"
 
 // Extended Transaction type with additional frontend fields
 type EnrichedTransaction = TransactionRes & {
@@ -329,11 +329,10 @@ export default function TransactionsPage() {
                               </p>
                               <div className="flex gap-3">
                                 <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                                  <Image
-                                    src={request.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                                  <ResolvedImage
+                                    imageRef={request.requested_item?.image_urls?.[0] || "/placeholder.svg"}
                                     alt={request.requested_item?.title || "Item"}
-                                    fill
-                                    className="object-cover"
+                                    className="absolute inset-0 h-full w-full object-cover"
                                   />
                                 </div>
                                 <div>
@@ -365,11 +364,10 @@ export default function TransactionsPage() {
                               {request.type === "trade" && request.offered_item ? (
                                 <div className="flex gap-3">
                                   <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                                    <Image
-                                      src={request.offered_item.image_urls?.[0] || "/placeholder.svg"}
+                                    <ResolvedImage
+                                      imageRef={request.offered_item.image_urls?.[0] || "/placeholder.svg"}
                                       alt={request.offered_item.title || "Offered Item"}
-                                      fill
-                                      className="object-cover"
+                                      className="absolute inset-0 h-full w-full object-cover"
                                     />
                                   </div>
                                   <div>
@@ -448,11 +446,10 @@ export default function TransactionsPage() {
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
                             <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
-                              <Image
-                                src={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                              <ResolvedImage
+                                imageRef={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
                                 alt={transaction.requested_item?.title || "Transaction Item"}
-                                fill
-                                className="object-cover"
+                                className="absolute inset-0 h-full w-full object-cover"
                               />
                             </div>
                             <div className="flex-1">
@@ -526,11 +523,10 @@ export default function TransactionsPage() {
                         <CardContent className="p-6">
                           <div className="flex items-start gap-4">
                             <div className="relative h-20 w-20 rounded-lg overflow-hidden border flex-shrink-0">
-                              <Image
-                                src={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
+                              <ResolvedImage
+                                imageRef={transaction.requested_item?.image_urls?.[0] || "/placeholder.svg"}
                                 alt={transaction.requested_item?.title || "Transaction Item"}
-                                fill
-                                className="object-cover"
+                                className="absolute inset-0 h-full w-full object-cover"
                               />
                             </div>
                             <div className="flex-1">

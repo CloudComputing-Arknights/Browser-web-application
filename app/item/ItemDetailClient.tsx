@@ -7,12 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { MapPin, Calendar, Heart, MessageCircle, Star, Package, Loader2, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 
 import { getOpenAPIConfiguration } from "@/lib/APIConfig"
 import { ItemsApi, ItemRead } from "@/client"
+import { ResolvedImage } from "@/components/resolved-image"
 
 interface ItemDetailClientProps {
     itemId: string
@@ -99,7 +99,7 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
         )
     }
 
-    const mainImage = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : "/placeholder.svg";
+    const mainImageRef = (item.image_urls && item.image_urls.length > 0) ? item.image_urls[0] : "/placeholder.svg";
 
     return (
         <div>
@@ -110,11 +110,10 @@ export default function ItemDetailClient({ itemId }: ItemDetailClientProps) {
                         {/* Image */}
                         <Card className="overflow-hidden">
                             <div className="aspect-video relative bg-muted">
-                                {/* Note: If mainImage is http link, should set images.remotePatterns in next.config.js */}
-                                <img
-                                    src={mainImage}
+                                <ResolvedImage
+                                    imageRef={mainImageRef}
                                     alt={item.title}
-                                    className="w-full h-full object-cover"
+                                    className="absolute inset-0 h-full w-full object-cover"
                                 />
                             </div>
                         </Card>

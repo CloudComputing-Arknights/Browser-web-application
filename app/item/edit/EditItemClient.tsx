@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { X, Loader2, Save, User } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
+import { ResolvedImage } from "@/components/resolved-image"
 import { toast } from "sonner"
 
 import { getOpenAPIConfiguration } from "@/lib/APIConfig"
@@ -150,11 +150,10 @@ export default function EditItemClient({ itemId }: EditItemClientProps) {
                             <div className="grid grid-cols-3 gap-4">
                                 {itemData.image_urls?.map((url, index) => (
                                     <div key={index} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
-                                        <Image
-                                            src={url || "/placeholder.svg"}
+                                        <ResolvedImage
+                                            imageRef={url || "/placeholder.svg"}
                                             alt={`Item ${index + 1}`}
-                                            fill
-                                            className="object-cover"
+                                            className="absolute inset-0 h-full w-full object-cover"
                                         />
                                         <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-6 w-6">
                                             <X className="h-4 w-4" />

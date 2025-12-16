@@ -3,7 +3,7 @@
 import {useEffect, useState} from "react"
 import {useRouter} from "next/navigation"
 import Link from "next/link"
-import {Upload, Loader2, AlertCircle} from "lucide-react"
+import {Upload, Loader2, AlertCircle, X} from "lucide-react"
 
 // UI Components
 import {Header} from "@/components/header"
@@ -15,6 +15,9 @@ import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/compo
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
 
 import {getOpenAPIConfiguration} from "@/lib/APIConfig"
+import { getFcmToken } from "@/lib/firebaseMessaging"
+import { uploadImageFile } from "@/lib/imageApi"
+import { ResolvedImage } from "@/components/resolved-image"
 import {
     ItemUserApi,
     ItemsApi,
@@ -31,7 +34,9 @@ export default function AddItemPage() {
 
     const [isLoading, setIsLoading] = useState(false)
     const [isPageLoading, setIsPageLoading] = useState(true)
+    const [isUploadingImages, setIsUploadingImages] = useState(false)
     const [errorMessage, setErrorMessage] = useState<string | null>(null)
+    const [imageUploadError, setImageUploadError] = useState<string | null>(null)
     const [statusMessage, setStatusMessage] = useState<string>("")
 
     const [categories, setCategories] = useState<CategoryRead[]>([])
@@ -82,16 +87,42 @@ export default function AddItemPage() {
         if (errorMessage) setErrorMessage(null)
     }
 
-    // Mock upload of picture
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            // TODO: fakeURL
-            const fakeUrl = "https://placehold.co/600x400.png"
-            setFormData(prev => ({
-                ...prev,
-                image_urls: [...prev.image_urls, fakeUrl]
-            }))
+    // Real image upload: upload -> receive UUID -> store UUID in image_urls (post payload)
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files ?? [])
+        if (files.length === 0) return
+
+        setImageUploadError(null)
+        setIsUploadingImages(true)
+
+        try {
+            const fcmToken = await getFcmToken()
+            if (!fcmToken) {
+                console.warn("Could not get FCM token, proceeding without it.")
+            }
+
+            for (const file of files) {
+                const uuidFilename = await uploadImageFile(file, fcmToken)
+                setFormData(prev => ({
+                    ...prev,
+                    image_urls: [...prev.image_urls, uuidFilename],
+                }))
+            }
+        } catch (err: any) {
+            console.error(err)
+            setImageUploadError(err?.message || "Image upload failed.")
+        } finally {
+            setIsUploadingImages(false)
+            // allow uploading same file again
+            e.target.value = ""
         }
+    }
+
+    const removeImage = (idx: number) => {
+        setFormData(prev => ({
+            ...prev,
+            image_urls: prev.image_urls.filter((_, i) => i !== idx),
+        }))
     }
 
     const pollJobStatus = async (jobId: string, api: ItemUserApi) => {
@@ -155,6 +186,7 @@ export default function AddItemPage() {
                 transaction_type: apiTransactionType,
                 category_ids: [parseInt(formData.category_id)],
                 address_UUID: formData.address_id,
+                // IMPORTANT: we store UUID filenames here; UI resolves to signed URLs when displaying
                 image_urls: formData.image_urls
             })
 
@@ -208,6 +240,7 @@ export default function AddItemPage() {
                                     className="relative border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer group">
                                     <input
                                         type="file"
+                                        multiple
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                         onChange={handleImageUpload}
                                         accept="image/*"
@@ -217,10 +250,38 @@ export default function AddItemPage() {
                                     <p className="text-sm font-medium mb-1">Click to upload or drag and drop</p>
                                     <p className="text-xs text-muted-foreground">PNG, JPG or GIF (max. 5MB each)</p>
                                 </div>
+                                {imageUploadError && (
+                                    <div className="bg-red-50 border border-red-200 text-red-600 p-3 rounded-md flex items-center gap-2">
+                                        <AlertCircle className="h-4 w-4"/>
+                                        <span className="text-sm font-medium">{imageUploadError}</span>
+                                    </div>
+                                )}
                                 {formData.image_urls.length > 0 && (
                                     <p className="text-sm text-green-600 mt-2">
-                                        {formData.image_urls.length} pictures chosen
+                                        {isUploadingImages ? "Uploading..." : `${formData.image_urls.length} picture(s) uploaded`}
                                     </p>
+                                )}
+                                {formData.image_urls.length > 0 && (
+                                    <div className="grid grid-cols-3 gap-3 pt-2">
+                                        {formData.image_urls.map((ref, idx) => (
+                                            <div key={`${ref}-${idx}`} className="relative aspect-square rounded-lg overflow-hidden border bg-muted">
+                                                <ResolvedImage
+                                                    imageRef={ref}
+                                                    alt={`Item photo ${idx + 1}`}
+                                                    className="absolute inset-0 h-full w-full object-cover"
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="absolute top-2 right-2 h-6 w-6"
+                                                    onClick={() => removeImage(idx)}
+                                                >
+                                                    <X className="h-4 w-4"/>
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </div>
 
@@ -349,7 +410,7 @@ export default function AddItemPage() {
                             {/* Action Buttons */}
                             <div className="flex gap-3 pt-4">
                                 <Button className="flex-1" onClick={handleSubmit}
-                                        disabled={isLoading || myAddresses.length === 0}>
+                                        disabled={isLoading || isUploadingImages || myAddresses.length === 0}>
                                     {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin"/>}
                                     {statusMessage ? statusMessage : "Publish Listing"}
                                 </Button>

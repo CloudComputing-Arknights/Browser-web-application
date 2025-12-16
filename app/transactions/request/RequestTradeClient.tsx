@@ -11,7 +11,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ArrowRightLeft, DollarSign, Package, Loader2, AlertCircle } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -21,6 +20,7 @@ import ItemUserClient from "@/lib/clients/ItemUserClient"
 import TransactionClient from "@/lib/clients/TransactionClient"
 import UserClient from "@/lib/clients/UserClient"
 import { ItemRead, CreateTransactionReq } from "@/client"
+import { ResolvedImage } from "@/components/resolved-image"
 
 interface RequestTradeClientProps {
   itemId: string
@@ -230,11 +230,10 @@ export default function RequestTradeClient({ itemId }: RequestTradeClientProps) 
             <CardContent>
               <div className="flex items-center gap-4">
                 <div className="relative h-24 w-24 rounded-lg overflow-hidden border flex-shrink-0">
-                  <Image
-                    src={targetItem.image}
+                  <ResolvedImage
+                    imageRef={targetItem.image}
                     alt={targetItem.title}
-                    fill
-                    className="object-cover"
+                    className="absolute inset-0 h-full w-full object-cover"
                   />
                 </div>
                 <div className="flex-1">
@@ -315,11 +314,10 @@ export default function RequestTradeClient({ itemId }: RequestTradeClientProps) 
                             <p className="text-sm font-medium mb-2">Your offer:</p>
                             <div className="flex items-center gap-3">
                               <div className="relative h-16 w-16 rounded-lg overflow-hidden border flex-shrink-0">
-                                <Image
-                                  src={myItems.find((userItem) => userItem.item_UUID === selectedItem)?.image_urls?.[0] || "/placeholder.svg"}
+                                <ResolvedImage
+                                  imageRef={myItems.find((userItem) => userItem.item_UUID === selectedItem)?.image_urls?.[0] || "/placeholder.svg"}
                                   alt={myItems.find((userItem) => userItem.item_UUID === selectedItem)?.title || ""}
-                                  fill
-                                  className="object-cover"
+                                  className="absolute inset-0 h-full w-full object-cover"
                                 />
                               </div>
                               <div>

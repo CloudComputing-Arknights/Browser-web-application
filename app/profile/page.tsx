@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { MapPin, Calendar, Star, Package, Clock, LogOut, Plus, Trash2, Edit2 } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { logoutUser } from "@/lib/auth"
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
+import type { ItemRead } from "@/client"
+import { ResolvedImage } from "@/components/resolved-image"
 
 // --- Interfaces matching Backend Models ---
 
@@ -35,10 +36,7 @@ interface UserProfile {
   totalTrades?: number
 }
 
-interface Item {
-  item_UUID: string
-  title: string
-  image_url?: string
+type Item = ItemRead & {
   status?: string
   type?: string
 }
@@ -107,7 +105,7 @@ export default function ProfilePage() {
         }
 
         setUser(userData)
-        setItems(Array.isArray(itemsData) ? itemsData : [])
+        setItems(Array.isArray(itemsData) ? (itemsData as Item[]) : [])
 
       } catch (err: any) {
         console.error("Profile Fetch Error:", err)
@@ -292,8 +290,8 @@ export default function ProfilePage() {
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
                   <div className="relative">
-                    <Image
-                      src={user?.avatar_url || "/placeholder.svg"}
+                    <ResolvedImage
+                      imageRef={user?.avatar_url || "/placeholder.svg"}
                       alt={user?.username || "User"}
                       width={120}
                       height={120}
@@ -364,11 +362,11 @@ export default function ProfilePage() {
                       {items.map((item) => (
                         <Card key={item.item_UUID} className="overflow-hidden">
                           <div className="aspect-video relative bg-gray-100">
-                            {item.image_url ? (
-                              <Image src={item.image_url} alt={item.title} fill className="object-cover" />
-                            ) : (
-                              <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
-                            )}
+                            <ResolvedImage
+                              imageRef={item.image_urls?.[0] || "/placeholder.svg"}
+                              alt={item.title}
+                              className="absolute inset-0 h-full w-full object-cover"
+                            />
                           </div>
                           <CardContent className="p-4">
                             <div className="flex items-start justify-between gap-2">
