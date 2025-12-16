@@ -13,9 +13,11 @@ Google Cloud Run:
 
 **[https://browser-web-application-177030329297.europe-west1.run.app/](https://browser-web-application-177030329297.europe-west1.run.app/)**
 
-Google Cloud Storage (replace our-bucket-name with your bucket name):
+Google Cloud Storage:
 
-**[https://our-bucket-name.storage.googleapis.com/index.html](https://our-bucket-name.storage.googleapis.com/index.html)**
+**[ https://cloud-computing-web-ui-app.storage.googleapis.com/index.html
+]( https://cloud-computing-web-ui-app.storage.googleapis.com/index.html
+)**
 
 
 ## Getting Started
